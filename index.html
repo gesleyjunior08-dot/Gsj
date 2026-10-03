@@ -1,0 +1,185 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>GSJ Marcenaria</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#954f14">
+<meta name="description" content="App interno da GSJ Marcenaria & Móveis Planejados: orçamentos, contratos, recibos, termos de entrega e planos de corte.">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GSJ">
+<style>
+  html { color-scheme: light dark; }
+  body { margin: 0; }
+
+  @import url("https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Source+Sans+3:wght@400;500;600;700&display=swap");
+
+  :root {
+    --bg: #faf6ef;
+    --surface: #ffffff;
+    --surface-2: #fffdf9;
+    --text: #2b2118;
+    --text-muted: #6b5d4f;
+    --accent: #954f14;
+    --accent-2: #c9832e;
+    --accent-soft: #f4e9da;
+    --line: #e3d9c8;
+    --shadow: 0 1px 2px rgba(43, 33, 24, 0.05), 0 12px 32px rgba(43, 33, 24, 0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
+      --text: #efe7da; --text-muted: #b3a591;
+      --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
+      --line: #3c3226;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
+    --text: #efe7da; --text-muted: #b3a591;
+    --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
+    --line: #3c3226;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 36px 20px 60px; }
+
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--text); color: var(--accent-2);
+    font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 18px;
+    margin-bottom: 18px;
+  }
+
+  h1 { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: clamp(28px, 5vw, 38px); margin: 0 0 6px; }
+  .tagline { color: var(--text-muted); font-size: 15px; margin: 0 0 28px; max-width: 46ch; }
+
+  .install-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    background: var(--accent-soft); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 28px;
+  }
+  .install-bar p { margin: 0; font-size: 14px; color: var(--text-muted); }
+  .install-bar strong { color: var(--text); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--text);
+    font: inherit; font-weight: 600; font-size: 14px; padding: 9px 14px; cursor: pointer;
+    text-decoration: none; white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  [hidden] { display: none !important; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .card {
+    display: flex; flex-direction: column; gap: 8px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    padding: 20px; text-decoration: none; color: var(--text); box-shadow: var(--shadow);
+    transition: transform 0.12s ease, border-color 0.12s ease;
+  }
+  .card:hover { border-color: var(--accent-2); transform: translateY(-2px); }
+  .card .icon {
+    width: 38px; height: 38px; border-radius: 10px; background: var(--accent-soft);
+    display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 4px;
+  }
+  .card h2 { font-family: "Newsreader", ui-serif, Georgia, serif; font-size: 19px; margin: 0; font-weight: 600; }
+  .card p { margin: 0; font-size: 13.5px; color: var(--text-muted); line-height: 1.45; }
+
+  footer { border-top: 1px solid var(--line); padding-top: 18px; font-size: 12.5px; color: var(--text-muted); }
+  footer p { margin: 0 0 4px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="badge">GSJ</div>
+    <h1>Central GSJ</h1>
+    <p class="tagline">Marcenaria &amp; Móveis Planejados — ferramentas internas de orçamento, contrato e produção, com os dados salvos na nuvem e sincronizados entre a equipe.</p>
+
+    <div class="install-bar" id="installBar" hidden>
+      <p><strong>Instale como app</strong> — abre direto pelo ícone, em tela cheia, sem precisar do navegador.</p>
+      <button class="btn btn-primary" id="installBtn" type="button">Instalar app</button>
+    </div>
+
+    <div class="install-bar" id="iosBar" hidden>
+      <p>No iPhone: toque em <strong>Compartilhar</strong> (⬆️) na barra do Safari e depois em <strong>"Adicionar à Tela de Início"</strong> pra instalar como app.</p>
+    </div>
+
+    <div class="grid">
+      <a class="card" href="./orcamento.html">
+        <div class="icon">📋</div>
+        <h2>Orçamento</h2>
+        <p>Monta o orçamento com itens, pacotes e desconto, e gera o PDF pro cliente.</p>
+      </a>
+      <a class="card" href="./contrato.html">
+        <div class="icon">📄</div>
+        <h2>Contrato</h2>
+        <p>Contrato de prestação de serviço, já com termo de medição e uso de imagem.</p>
+      </a>
+      <a class="card" href="./recibo.html">
+        <div class="icon">🧾</div>
+        <h2>Recibo</h2>
+        <p>Recibo de pagamento, formato A5, rápido de preencher e imprimir.</p>
+      </a>
+      <a class="card" href="./termo-entrega.html">
+        <div class="icon">📦</div>
+        <h2>Termo de Entrega</h2>
+        <p>Confirmação de entrega dos móveis, com a lista de itens entregues.</p>
+      </a>
+      <a class="card" href="./plano-de-cortes.html">
+        <div class="icon">📐</div>
+        <h2>Plano de Cortes</h2>
+        <p>Calcula chapas necessárias, aproveitamento e desenha o encaixe das peças.</p>
+      </a>
+    </div>
+
+    <footer>
+      <p>Os dados salvos na nuvem são compartilhados entre todos os dispositivos da equipe que entrarem com a senha de acesso.</p>
+      <p>GSJ Marcenaria &amp; Móveis Planejados</p>
+    </footer>
+  </div>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("./sw.js").catch(function () {});
+    });
+  }
+
+  // botão de instalar (Android/desktop Chrome/Edge)
+  let deferredPrompt = null;
+  const installBar = document.getElementById("installBar");
+  const installBtn = document.getElementById("installBtn");
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBar.hidden = false;
+  });
+  installBtn.addEventListener("click", function () {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.finally ? deferredPrompt.finally(() => { deferredPrompt = null; installBar.hidden = true; })
+      : (deferredPrompt = null, installBar.hidden = true);
+  });
+  window.addEventListener("appinstalled", function () { installBar.hidden = true; });
+
+  // iOS Safari não dispara beforeinstallprompt — mostra instrução manual
+  (function () {
+    const ua = window.navigator.userAgent;
+    const isIOS = /iphone|ipad|ipod/i.test(ua);
+    const isStandalone = window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
+    if (isIOS && !isStandalone) {
+      document.getElementById("iosBar").hidden = false;
+    }
+  })();
+</script>
+</body></html>
