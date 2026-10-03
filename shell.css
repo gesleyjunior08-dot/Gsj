@@ -84,6 +84,15 @@
   background: var(--surface-2); color: var(--text); font: inherit; font-size: 14.5px;
 }
 .gsj-auth-field input:focus { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+.gsj-pw-wrap { position: relative; }
+.gsj-pw-wrap input { padding-right: 40px; }
+.gsj-pw-toggle {
+  position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+  width: 32px; height: 32px; border: none; background: none; cursor: pointer;
+  font-size: 15px; display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; color: var(--text-muted);
+}
+.gsj-pw-toggle:hover { background: var(--accent-soft); }
 .gsj-auth-error {
   background: var(--danger-soft, #f4e1dc); color: var(--danger, #a6402f); border-radius: 10px;
   padding: 9px 12px; font-size: 13px; margin: 0 0 12px;

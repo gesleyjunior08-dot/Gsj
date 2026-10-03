@@ -42,6 +42,31 @@
     return clean ? clean + EMAIL_DOMAIN : "";
   }
 
+  // campo de senha com botão de "mostrar/esconder" (olho) — reaproveitado no
+  // login e no cadastro
+  function pwFieldHtml(id, label, autocomplete) {
+    return (
+      '<div class="gsj-auth-field"><label for="' + id + '">' + label + '</label>' +
+      '<div class="gsj-pw-wrap">' +
+        '<input id="' + id + '" type="password" autocomplete="' + autocomplete + '" />' +
+        '<button type="button" class="gsj-pw-toggle" data-for="' + id + '" aria-label="Mostrar senha">👁</button>' +
+      '</div></div>'
+    );
+  }
+
+  function wirePwToggles(root) {
+    root.querySelectorAll(".gsj-pw-toggle").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var input = document.getElementById(btn.getAttribute("data-for"));
+        if (!input) return;
+        var showing = input.type === "text";
+        input.type = showing ? "password" : "text";
+        btn.textContent = showing ? "👁" : "🙈";
+        btn.setAttribute("aria-label", showing ? "Mostrar senha" : "Esconder senha");
+      });
+    });
+  }
+
   // ---- registro de atividade (pro painel do admin) ----
   GSJ.logAction = function (acao, ferramenta, referencia) {
     if (!sb || !GSJ.user) return;
@@ -157,10 +182,11 @@
       '<p class="gsj-auth-error" id="gsjErr" hidden></p>' +
       '<form id="gsjLoginForm">' +
         '<div class="gsj-auth-field"><label for="gsjLUser">Usuário</label><input id="gsjLUser" autocomplete="username" autocapitalize="off" /></div>' +
-        '<div class="gsj-auth-field"><label for="gsjLPass">Senha</label><input id="gsjLPass" type="password" autocomplete="current-password" /></div>' +
+                pwFieldHtml('gsjLPass', 'Senha', 'current-password') +
         '<div class="gsj-auth-actions"><button type="submit" class="btn btn-primary" id="gsjLBtn">Entrar</button></div>' +
       '</form>' +
       '<p class="gsj-auth-switch">Ainda não tem conta? <button type="button" id="gsjGoSignup">Criar conta</button></p>';
+    wirePwToggles(box);
 
     document.getElementById("gsjGoSignup").addEventListener("click", function () {
       renderSignup(box, onDone);
@@ -208,11 +234,12 @@
       '<form id="gsjSignupForm">' +
         '<div class="gsj-auth-field"><label for="gsjSNome">Seu nome</label><input id="gsjSNome" autocomplete="name" /></div>' +
         '<div class="gsj-auth-field"><label for="gsjSUser">Usuário (sem espaço/acento)</label><input id="gsjSUser" autocomplete="username" autocapitalize="off" /></div>' +
-        '<div class="gsj-auth-field"><label for="gsjSPass">Senha (mín. 6 caracteres)</label><input id="gsjSPass" type="password" autocomplete="new-password" /></div>' +
-        '<div class="gsj-auth-field"><label for="gsjSPass2">Confirmar senha</label><input id="gsjSPass2" type="password" autocomplete="new-password" /></div>' +
+                pwFieldHtml('gsjSPass', 'Senha (mín. 6 caracteres)', 'new-password') +
+                pwFieldHtml('gsjSPass2', 'Confirmar senha', 'new-password') +
         '<div class="gsj-auth-actions"><button type="submit" class="btn btn-primary" id="gsjSBtn">Criar conta</button></div>' +
       '</form>' +
       '<p class="gsj-auth-switch">Já tem conta? <button type="button" id="gsjGoLogin">Entrar</button></p>';
+    wirePwToggles(box);
 
     document.getElementById("gsjGoLogin").addEventListener("click", function () {
       renderLogin(box, onDone);
