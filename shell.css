@@ -1,0 +1,99 @@
+/* Casca do app GSJ: barra lateral, menu mobile, tela de login/cadastro/aprovação.
+   Usa as mesmas variáveis de cor (--bg, --accent, etc.) já definidas em cada página.
+   Prefixo "gsj-" em tudo pra nunca colidir com o CSS interno de cada ferramenta. */
+
+.gsj-shell { min-height: 100vh; display: flex; align-items: stretch; }
+
+.gsj-sidebar {
+  width: 248px; flex: 0 0 248px;
+  background: var(--surface); border-right: 1px solid var(--line);
+  display: flex; flex-direction: column;
+  padding: 18px 14px; padding-top: calc(18px + env(safe-area-inset-top, 0px));
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+
+.gsj-brand {
+  display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text);
+  padding: 4px 6px 16px; border-bottom: 1px solid var(--line); margin-bottom: 14px;
+}
+.gsj-brand .badge {
+  width: 34px; height: 34px; border-radius: 50%; background: var(--text); color: var(--accent-2);
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;
+  font-family: "Newsreader", ui-serif, Georgia, serif; flex: none;
+}
+.gsj-brand span.name { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 15.5px; }
+
+.gsj-nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.gsj-nav a {
+  display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text);
+  padding: 10px 12px; border-radius: 10px; font-size: 14.5px; font-weight: 500;
+}
+.gsj-nav a:hover { background: var(--accent-soft); }
+.gsj-nav a.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.gsj-nav .gsj-nav-sep { height: 1px; background: var(--line); margin: 10px 4px; }
+.gsj-nav .gsj-nav-admin { color: var(--text-muted); }
+.gsj-nav .gsj-nav-admin.active { color: var(--accent); }
+
+.gsj-sidebar-bottom { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 8px; }
+.gsj-user-info { font-size: 12.5px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4; padding: 0 4px; }
+.gsj-user-info strong { color: var(--text); display: block; font-size: 13.5px; }
+
+.gsj-menu-btn {
+  display: none; position: fixed; top: calc(14px + env(safe-area-inset-top, 0px)); left: 14px; z-index: 40;
+  width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--text); font-size: 18px; box-shadow: var(--shadow);
+  align-items: center; justify-content: center;
+}
+
+.gsj-overlay {
+  position: fixed; inset: 0; background: rgba(43, 33, 24, 0.45); z-index: 30;
+}
+
+.gsj-main { flex: 1; min-width: 0; }
+
+@media (max-width: 880px) {
+  .gsj-menu-btn { display: flex; }
+  .gsj-sidebar {
+    position: fixed; top: 0; left: 0; z-index: 35; height: 100vh;
+    transform: translateX(-100%); transition: transform 0.2s ease; box-shadow: var(--shadow);
+  }
+  .gsj-sidebar.open { transform: translateX(0); }
+  .gsj-main { padding-top: 60px; }
+}
+
+/* ---- tela de login / cadastro / aprovação pendente (substitui a antiga senha única) ---- */
+.gsj-auth-gate {
+  position: fixed; inset: 0; z-index: 100; background: var(--bg);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.gsj-auth-box {
+  width: 100%; max-width: 380px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 18px; padding: 28px 26px; box-shadow: var(--shadow);
+}
+.gsj-auth-box .gsj-auth-badge {
+  width: 44px; height: 44px; border-radius: 50%; background: var(--text); color: var(--accent-2);
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;
+  font-family: "Newsreader", ui-serif, Georgia, serif; margin-bottom: 16px;
+}
+.gsj-auth-box h2 { font-family: "Newsreader", ui-serif, Georgia, serif; font-size: 21px; margin: 0 0 6px; }
+.gsj-auth-box p.gsj-auth-sub { color: var(--text-muted); font-size: 13.5px; margin: 0 0 18px; line-height: 1.5; }
+.gsj-auth-field { margin-bottom: 12px; }
+.gsj-auth-field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+.gsj-auth-field input {
+  width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--surface-2); color: var(--text); font: inherit; font-size: 14.5px;
+}
+.gsj-auth-field input:focus { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+.gsj-auth-error {
+  background: var(--danger-soft, #f4e1dc); color: var(--danger, #a6402f); border-radius: 10px;
+  padding: 9px 12px; font-size: 13px; margin: 0 0 12px;
+}
+.gsj-auth-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.gsj-auth-switch { text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 14px; }
+.gsj-auth-switch button {
+  background: none; border: none; color: var(--accent); font: inherit; font-weight: 600;
+  cursor: pointer; padding: 0; text-decoration: underline;
+}
+.gsj-auth-pending { text-align: center; }
+.gsj-auth-pending .gsj-auth-icon { font-size: 34px; margin-bottom: 10px; }
+[hidden] { display: none !important; }

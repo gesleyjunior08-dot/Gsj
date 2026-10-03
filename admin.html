@@ -1,0 +1,240 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Admin · GSJ Marcenaria</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#954f14">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GSJ">
+<style>
+  html { color-scheme: light dark; }
+  body { margin: 0; }
+
+  @import url("https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Source+Sans+3:wght@400;500;600;700&display=swap");
+
+  :root {
+    --bg: #faf6ef; --surface: #ffffff; --surface-2: #fffdf9;
+    --text: #2b2118; --text-muted: #6b5d4f;
+    --accent: #954f14; --accent-2: #c9832e; --accent-soft: #f4e9da;
+    --line: #e3d9c8; --danger: #a6402f; --danger-soft: #f4e1dc;
+    --ok: #3f7d4a; --ok-soft: #e3f0e4;
+    --shadow: 0 1px 2px rgba(43, 33, 24, 0.05), 0 12px 32px rgba(43, 33, 24, 0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
+      --text: #efe7da; --text-muted: #b3a591;
+      --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
+      --line: #3c3226; --danger: #d97d68; --danger-soft: #3a241f;
+      --ok: #7dbb86; --ok-soft: #223027;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
+    --text: #efe7da; --text-muted: #b3a591;
+    --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
+    --line: #3c3226; --danger: #d97d68; --danger-soft: #3a241f;
+    --ok: #7dbb86; --ok-soft: #223027;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--text);
+    font: inherit; font-weight: 600; font-size: 13.5px; padding: 7px 12px; cursor: pointer;
+    text-decoration: none; white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-danger { background: var(--danger-soft); border-color: var(--danger); color: var(--danger); }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 36px 24px 60px; }
+  h1 { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: clamp(24px, 5vw, 30px); margin: 0 0 6px; }
+  .tagline { color: var(--text-muted); font-size: 14.5px; margin: 0 0 30px; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 24px; }
+  .card h2 { font-family: "Newsreader", ui-serif, Georgia, serif; font-size: 18px; margin: 0 0 4px; }
+  .card .sub { font-size: 13px; color: var(--text-muted); margin: 0 0 16px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); padding: 6px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+  .badge-pending { background: var(--accent-soft); color: var(--accent); }
+  .badge-admin { background: var(--ok-soft); color: var(--ok); }
+  .empty { color: var(--text-muted); font-size: 13.5px; padding: 10px 0; }
+  .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .table-scroll { overflow-x: auto; }
+  [hidden] { display: none !important; }
+  .restricted { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="app" id="gsjPageRoot">
+    <div class="wrap">
+      <h1>Admin</h1>
+      <p class="tagline">Aprovação de contas e log de atividade da equipe.</p>
+
+      <div id="adminRestricted" class="restricted" hidden>
+        <p>Essa página é só pra administradores.</p>
+      </div>
+
+      <div id="adminContent" hidden>
+        <div class="card">
+          <h2>Pendentes de aprovação</h2>
+          <p class="sub">Contas criadas que ainda não têm acesso às ferramentas.</p>
+          <div id="pendingList"><p class="empty">Carregando…</p></div>
+        </div>
+
+        <div class="card">
+          <h2>Equipe</h2>
+          <p class="sub">Quem já tem acesso liberado.</p>
+          <div id="teamList"><p class="empty">Carregando…</p></div>
+        </div>
+
+        <div class="card">
+          <h2>Atividade recente</h2>
+          <p class="sub">Últimas 200 ações (login, salvar, abrir) de toda a equipe.</p>
+          <div class="table-scroll" id="activityList"><p class="empty">Carregando…</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<link rel="stylesheet" href="./shell.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./auth.js"></script>
+<script>
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function fmtDt(iso) {
+    if (!iso) return "—";
+    try { return new Date(iso).toLocaleString("pt-BR"); } catch (e) { return iso; }
+  }
+  var FERRAMENTA_LABEL = {
+    orcamento: "Orçamento", contrato: "Contrato", recibo: "Recibo",
+    termo: "Termo de Entrega", plano: "Plano de Cortes"
+  };
+
+  GSJ.boot({ page: "admin" }).then(function (user) {
+    if (!user) return;
+    if (user.role !== "admin") {
+      document.getElementById("adminRestricted").hidden = false;
+      return;
+    }
+    document.getElementById("adminContent").hidden = false;
+    loadPending();
+    loadTeam();
+    loadActivity();
+  });
+
+  function loadPending() {
+    var box = document.getElementById("pendingList");
+    GSJ.sb.from("gsj_profiles").select("id,username,nome,created_at")
+      .eq("approved", false).order("created_at", { ascending: true })
+      .then(function (res) {
+        if (res.error) { box.innerHTML = '<p class="empty">Não deu pra carregar agora.</p>'; return; }
+        var rows = res.data || [];
+        if (!rows.length) { box.innerHTML = '<p class="empty">Nenhuma conta esperando aprovação.</p>'; return; }
+        var html = '<div class="table-scroll"><table><thead><tr><th>Nome</th><th>Usuário</th><th>Criada em</th><th></th></tr></thead><tbody>';
+        rows.forEach(function (r) {
+          html += "<tr data-id=\"" + r.id + "\"><td>" + esc(r.nome || "—") + "</td><td>@" + esc(r.username) + "</td><td>" + fmtDt(r.created_at) + "</td>" +
+            '<td class="row-actions"><button class="btn btn-primary" data-action="approve" data-id="' + r.id + '">Aprovar</button></td></tr>';
+        });
+        html += "</tbody></table></div>";
+        box.innerHTML = html;
+        box.querySelectorAll('[data-action="approve"]').forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            btn.disabled = true;
+            btn.textContent = "Aprovando…";
+            GSJ.sb.from("gsj_profiles").update({
+              approved: true, approved_at: new Date().toISOString(), approved_by: GSJ.user.id
+            }).eq("id", btn.getAttribute("data-id")).then(function (res2) {
+              if (res2.error) { btn.disabled = false; btn.textContent = "Aprovar"; alert("Não deu pra aprovar agora."); return; }
+              loadPending();
+              loadTeam();
+            });
+          });
+        });
+      });
+  }
+
+  function loadTeam() {
+    var box = document.getElementById("teamList");
+    GSJ.sb.from("gsj_profiles").select("id,username,nome,role,approved_at")
+      .eq("approved", true).order("username", { ascending: true })
+      .then(function (res) {
+        if (res.error) { box.innerHTML = '<p class="empty">Não deu pra carregar agora.</p>'; return; }
+        var rows = res.data || [];
+        if (!rows.length) { box.innerHTML = '<p class="empty">Ninguém aprovado ainda.</p>'; return; }
+        var html = '<div class="table-scroll"><table><thead><tr><th>Nome</th><th>Usuário</th><th>Papel</th><th>Desde</th><th></th></tr></thead><tbody>';
+        rows.forEach(function (r) {
+          var isSelf = r.id === GSJ.user.id;
+          html += "<tr data-id=\"" + r.id + "\"><td>" + esc(r.nome || "—") + "</td><td>@" + esc(r.username) + "</td>" +
+            "<td>" + (r.role === "admin" ? '<span class="badge badge-admin">admin</span>' : "equipe") + "</td>" +
+            "<td>" + fmtDt(r.approved_at) + "</td>" +
+            '<td class="row-actions">' +
+              (isSelf ? "" :
+                '<button class="btn" data-action="toggle-admin" data-id="' + r.id + '" data-role="' + r.role + '">' +
+                  (r.role === "admin" ? "Remover admin" : "Tornar admin") + "</button>" +
+                '<button class="btn btn-danger" data-action="revoke" data-id="' + r.id + '">Bloquear</button>'
+              ) +
+            "</td></tr>";
+        });
+        html += "</tbody></table></div>";
+        box.innerHTML = html;
+        box.querySelectorAll('[data-action="toggle-admin"]').forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var newRole = btn.getAttribute("data-role") === "admin" ? "user" : "admin";
+            btn.disabled = true;
+            GSJ.sb.from("gsj_profiles").update({ role: newRole }).eq("id", btn.getAttribute("data-id")).then(function (res2) {
+              if (res2.error) { alert("Não deu pra mudar agora."); }
+              loadTeam();
+            });
+          });
+        });
+        box.querySelectorAll('[data-action="revoke"]').forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            if (!confirm("Bloquear o acesso dessa pessoa? Ela vai precisar ser aprovada de novo.")) return;
+            btn.disabled = true;
+            GSJ.sb.from("gsj_profiles").update({ approved: false }).eq("id", btn.getAttribute("data-id")).then(function (res2) {
+              if (res2.error) { alert("Não deu pra bloquear agora."); }
+              loadTeam();
+              loadPending();
+            });
+          });
+        });
+      });
+  }
+
+  function loadActivity() {
+    var box = document.getElementById("activityList");
+    GSJ.sb.from("gsj_audit_log").select("username,acao,ferramenta,referencia,created_at")
+      .order("created_at", { ascending: false }).limit(200)
+      .then(function (res) {
+        if (res.error) { box.innerHTML = '<p class="empty">Não deu pra carregar agora.</p>'; return; }
+        var rows = res.data || [];
+        if (!rows.length) { box.innerHTML = '<p class="empty">Nenhuma atividade registrada ainda.</p>'; return; }
+        var html = '<table><thead><tr><th>Quando</th><th>Quem</th><th>Ação</th><th>Ferramenta</th><th>Referência</th></tr></thead><tbody>';
+        rows.forEach(function (r) {
+          html += "<tr><td>" + fmtDt(r.created_at) + "</td><td>@" + esc(r.username) + "</td><td>" + esc(r.acao) + "</td>" +
+            "<td>" + esc(FERRAMENTA_LABEL[r.ferramenta] || r.ferramenta || "—") + "</td><td>" + esc(r.referencia || "—") + "</td></tr>";
+        });
+        html += "</tbody></table>";
+        box.innerHTML = html;
+      });
+  }
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("./sw.js").catch(function () {});
+    });
+  }
+</script>
+</body></html>

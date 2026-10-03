@@ -394,19 +394,12 @@
     });
   }
 </script>
+<link rel="stylesheet" href="./shell.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./auth.js"></script>
+<script>window.GSJ && window.GSJ.boot({ page: "orcamento" });</script>
 </head>
 <body>
-
-<div id="gsjAuthGate" class="auth-gate" hidden>
-  <div class="auth-box">
-    <div class="toolbar-lockup" style="margin-bottom:16px;"><span>GSJ</span></div>
-    <h2>Acesso à ferramenta</h2>
-    <p>Os orçamentos agora ficam salvos na nuvem, compartilhados entre os dispositivos da equipe. Digite a senha de acesso:</p>
-    <input id="gsjAuthInput" type="password" placeholder="Senha" autocomplete="current-password" />
-    <p id="gsjAuthError" class="auth-error" hidden>Senha incorreta — tente de novo.</p>
-    <button id="gsjAuthBtn" class="btn btn-primary" type="button" style="margin-top:14px;">Entrar</button>
-  </div>
-</div>
 
 <div id="gsjCloudModal" class="cloud-modal" hidden>
   <div class="cloud-modal-box">
@@ -418,9 +411,9 @@
   </div>
 </div>
 
-<div class="app">
+<div class="app" id="gsjPageRoot">
   <div class="app-header">
-    <div class="toolbar-lockup-row" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;"><div class="toolbar-lockup"><span>GSJ</span></div><a href="./index.html" class="btn btn-ghost" style="text-decoration:none;">← Todas as ferramentas</a></div>
+    <div class="toolbar-lockup"><span>GSJ</span></div>
     <p class="eyebrow">GSJ · ferramenta interna</p>
     <h1>Gerador de orçamentos</h1>
     <p>Preencha os dados à esquerda, confira a prévia à direita e gere o PDF — o layout é o mesmo que já foi enviado para os primeiros clientes.</p>
@@ -606,7 +599,6 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ---- geração de PDF: texto vetorial de verdade via jsPDF (não é window.print, que fica bloqueado no Artifact,
   // nem uma imagem/print da tela — ver central.md "PDF vetorial" pro histórico da decisão) ----
@@ -617,42 +609,8 @@
   // Projeto Supabase reaproveitado da obra "Vision" (ver central.md, 2026-10-03).
   // A anon key abaixo é pública por design (protegida por RLS + senha de acesso única
   // da equipe, não por sigilo da key) — não é um segredo a esconder.
-  var SUPABASE_URL = "https://brulthsmuhwftodbnhpg.supabase.co";
-  var SUPABASE_ANON_KEY = "sb_publishable_esuL-cCe9-_5BJfB1kgWMQ_kjHugWUs";
-  var sb = null;
-  try {
-    if (window.supabase && typeof window.supabase.createClient === "function") {
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
-  } catch (e) {}
+  var sb = window.GSJ.sb;
 
-  // ---- acesso único compartilhado (tipo Diamond) — sem login por pessoa ----
-  var AUTH_KEY = "gsj_cloud_auth_ok";
-  var GSJ_SENHA = "marcenaria2026"; // senha da equipe — pra trocar, edite só esta linha
-  (function setupAuthGate() {
-    var gate = document.getElementById("gsjAuthGate");
-    if (!gate) return;
-    var input = document.getElementById("gsjAuthInput");
-    var btn = document.getElementById("gsjAuthBtn");
-    var err = document.getElementById("gsjAuthError");
-    var already = false;
-    try { already = localStorage.getItem(AUTH_KEY) === "1"; } catch (e) {}
-    if (already) { gate.hidden = true; return; }
-    gate.hidden = false;
-    setTimeout(function () { input.focus(); }, 50);
-    function tryAuth() {
-      if ((input.value || "").trim() === GSJ_SENHA) {
-        try { localStorage.setItem(AUTH_KEY, "1"); } catch (e) {}
-        gate.hidden = true;
-      } else {
-        err.hidden = false;
-        input.value = "";
-        input.focus();
-      }
-    }
-    btn.addEventListener("click", tryAuth);
-    input.addEventListener("keydown", function (e) { if (e.key === "Enter") tryAuth(); });
-  })();
 
   var defaultState = {
     client: "Wesley e Priscila",
@@ -1433,6 +1391,8 @@
       }
       if (result.error) throw result.error;
       state.cloudId = result.data.id;
+      if (window.GSJ) GSJ.logAction("abrir", "orcamento", (state.orcamentoId || state.client || null));
+      if (window.GSJ) GSJ.logAction("salvar", "orcamento", (state.orcamentoId || state.client || null));
       safeSave();
       var hora = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
       setCloudStatus("Salvo na nuvem às " + hora + ".");

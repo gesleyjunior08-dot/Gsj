@@ -23,6 +23,8 @@
     --accent-2: #c9832e;
     --accent-soft: #f4e9da;
     --line: #e3d9c8;
+    --danger: #a6402f;
+    --danger-soft: #f4e1dc;
     --shadow: 0 1px 2px rgba(43, 33, 24, 0.05), 0 12px 32px rgba(43, 33, 24, 0.08);
   }
   @media (prefers-color-scheme: dark) {
@@ -30,7 +32,7 @@
       --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
       --text: #efe7da; --text-muted: #b3a591;
       --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
-      --line: #3c3226;
+      --line: #3c3226; --danger: #d97d68; --danger-soft: #3a241f;
       --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
     }
   }
@@ -38,39 +40,13 @@
     --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
     --text: #efe7da; --text-muted: #b3a591;
     --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
-    --line: #3c3226;
+    --line: #3c3226; --danger: #d97d68; --danger-soft: #3a241f;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
   }
 
   * { box-sizing: border-box; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
-    min-height: 100vh;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
+  body { background: var(--bg); color: var(--text); font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif; }
 
-  .wrap { max-width: 880px; margin: 0 auto; padding: 36px 20px 60px; }
-
-  .badge {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 52px; height: 52px; border-radius: 50%;
-    background: var(--text); color: var(--accent-2);
-    font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 18px;
-    margin-bottom: 18px;
-  }
-
-  h1 { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: clamp(28px, 5vw, 38px); margin: 0 0 6px; }
-  .tagline { color: var(--text-muted); font-size: 15px; margin: 0 0 28px; max-width: 46ch; }
-
-  .install-bar {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-    background: var(--accent-soft); border: 1px solid var(--line); border-radius: 14px;
-    padding: 14px 16px; margin-bottom: 28px;
-  }
-  .install-bar p { margin: 0; font-size: 14px; color: var(--text-muted); }
-  .install-bar strong { color: var(--text); }
   .btn {
     display: inline-flex; align-items: center; gap: 6px; border-radius: 10px;
     border: 1px solid var(--line); background: var(--surface); color: var(--text);
@@ -78,77 +54,91 @@
     text-decoration: none; white-space: nowrap;
   }
   .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  [hidden] { display: none !important; }
+  .btn-ghost { background: transparent; }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 32px; }
-  .card {
-    display: flex; flex-direction: column; gap: 8px;
-    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
-    padding: 20px; text-decoration: none; color: var(--text); box-shadow: var(--shadow);
-    transition: transform 0.12s ease, border-color 0.12s ease;
-  }
-  .card:hover { border-color: var(--accent-2); transform: translateY(-2px); }
-  .card .icon {
-    width: 38px; height: 38px; border-radius: 10px; background: var(--accent-soft);
-    display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 4px;
-  }
-  .card h2 { font-family: "Newsreader", ui-serif, Georgia, serif; font-size: 19px; margin: 0; font-weight: 600; }
-  .card p { margin: 0; font-size: 13.5px; color: var(--text-muted); line-height: 1.45; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 36px 24px 60px; }
 
-  footer { border-top: 1px solid var(--line); padding-top: 18px; font-size: 12.5px; color: var(--text-muted); }
-  footer p { margin: 0 0 4px; }
+  h1 { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: clamp(26px, 5vw, 34px); margin: 0 0 6px; }
+  .tagline { color: var(--text-muted); font-size: 15px; margin: 0 0 24px; max-width: 54ch; }
+
+  .install-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    background: var(--accent-soft); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 26px;
+  }
+  .install-bar p { margin: 0; font-size: 14px; color: var(--text-muted); }
+  .install-bar strong { color: var(--text); }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 30px; }
+  .stat-tile {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 18px; box-shadow: var(--shadow);
+  }
+  .stat-tile .num { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 28px; line-height: 1.1; }
+  .stat-tile .lbl { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+  .quick-section h2 { font-family: "Newsreader", ui-serif, Georgia, serif; font-size: 18px; margin: 0 0 12px; }
+  .quick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .quick-card {
+    display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px;
+    font-weight: 600; font-size: 14px;
+  }
+  .quick-card:hover { border-color: var(--accent-2); }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="badge">GSJ</div>
-    <h1>Central GSJ</h1>
-    <p class="tagline">Marcenaria &amp; Móveis Planejados — ferramentas internas de orçamento, contrato e produção, com os dados salvos na nuvem e sincronizados entre a equipe.</p>
+  <div class="app" id="gsjPageRoot">
+    <div class="wrap">
+      <h1>Início</h1>
+      <p class="tagline">Resumo geral do que está salvo na nuvem da GSJ Marcenaria &amp; Móveis Planejados.</p>
 
-    <div class="install-bar" id="installBar" hidden>
-      <p><strong>Instale como app</strong> — abre direto pelo ícone, em tela cheia, sem precisar do navegador.</p>
-      <button class="btn btn-primary" id="installBtn" type="button">Instalar app</button>
+      <div class="install-bar" id="installBar" hidden>
+        <p><strong>Instale como app</strong> — abre direto pelo ícone, em tela cheia, sem precisar do navegador.</p>
+        <button class="btn btn-primary" id="installBtn" type="button">Instalar app</button>
+      </div>
+      <div class="install-bar" id="iosBar" hidden>
+        <p>No iPhone: toque em <strong>Compartilhar</strong> (⬆️) na barra do Safari e depois em <strong>"Adicionar à Tela de Início"</strong> pra instalar como app.</p>
+      </div>
+
+      <div class="stat-grid" id="statGrid">
+        <div class="stat-tile"><div class="num">—</div><div class="lbl">Orçamentos</div></div>
+        <div class="stat-tile"><div class="num">—</div><div class="lbl">Contratos</div></div>
+        <div class="stat-tile"><div class="num">—</div><div class="lbl">Recibos</div></div>
+        <div class="stat-tile"><div class="num">—</div><div class="lbl">Termos de entrega</div></div>
+        <div class="stat-tile"><div class="num">—</div><div class="lbl">Planos de corte</div></div>
+      </div>
+
+      <div class="quick-section">
+        <h2>Acesso rápido</h2>
+        <div class="quick-grid">
+          <a class="quick-card" href="./orcamento.html">📋 Orçamento</a>
+          <a class="quick-card" href="./contrato.html">📄 Contrato</a>
+          <a class="quick-card" href="./recibo.html">🧾 Recibo</a>
+          <a class="quick-card" href="./termo-entrega.html">📦 Termo de Entrega</a>
+          <a class="quick-card" href="./plano-de-cortes.html">📐 Plano de Cortes</a>
+        </div>
+      </div>
     </div>
-
-    <div class="install-bar" id="iosBar" hidden>
-      <p>No iPhone: toque em <strong>Compartilhar</strong> (⬆️) na barra do Safari e depois em <strong>"Adicionar à Tela de Início"</strong> pra instalar como app.</p>
-    </div>
-
-    <div class="grid">
-      <a class="card" href="./orcamento.html">
-        <div class="icon">📋</div>
-        <h2>Orçamento</h2>
-        <p>Monta o orçamento com itens, pacotes e desconto, e gera o PDF pro cliente.</p>
-      </a>
-      <a class="card" href="./contrato.html">
-        <div class="icon">📄</div>
-        <h2>Contrato</h2>
-        <p>Contrato de prestação de serviço, já com termo de medição e uso de imagem.</p>
-      </a>
-      <a class="card" href="./recibo.html">
-        <div class="icon">🧾</div>
-        <h2>Recibo</h2>
-        <p>Recibo de pagamento, formato A5, rápido de preencher e imprimir.</p>
-      </a>
-      <a class="card" href="./termo-entrega.html">
-        <div class="icon">📦</div>
-        <h2>Termo de Entrega</h2>
-        <p>Confirmação de entrega dos móveis, com a lista de itens entregues.</p>
-      </a>
-      <a class="card" href="./plano-de-cortes.html">
-        <div class="icon">📐</div>
-        <h2>Plano de Cortes</h2>
-        <p>Calcula chapas necessárias, aproveitamento e desenha o encaixe das peças.</p>
-      </a>
-    </div>
-
-    <footer>
-      <p>Os dados salvos na nuvem são compartilhados entre todos os dispositivos da equipe que entrarem com a senha de acesso.</p>
-      <p>GSJ Marcenaria &amp; Móveis Planejados</p>
-    </footer>
   </div>
 
+<link rel="stylesheet" href="./shell.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./auth.js"></script>
 <script>
+  GSJ.boot({ page: "inicio" }).then(function () {
+    if (!GSJ.sb) return;
+    var tiles = document.querySelectorAll("#statGrid .num");
+    var tables = ["gsj_orcamentos", "gsj_contratos", "gsj_recibos", "gsj_termos_entrega", "gsj_planos_corte"];
+    tables.forEach(function (table, i) {
+      GSJ.sb.from(table).select("id", { count: "exact", head: true }).then(function (res) {
+        tiles[i].textContent = (res.count == null ? "—" : res.count);
+      }, function () {
+        tiles[i].textContent = "—";
+      });
+    });
+  });
+
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
       navigator.serviceWorker.register("./sw.js").catch(function () {});
@@ -167,12 +157,13 @@
   installBtn.addEventListener("click", function () {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
-    deferredPrompt.finally ? deferredPrompt.finally(() => { deferredPrompt = null; installBar.hidden = true; })
-      : (deferredPrompt = null, installBar.hidden = true);
+    Promise.resolve(deferredPrompt.userChoice).finally(function () {
+      deferredPrompt = null;
+      installBar.hidden = true;
+    });
   });
   window.addEventListener("appinstalled", function () { installBar.hidden = true; });
 
-  // iOS Safari não dispara beforeinstallprompt — mostra instrução manual
   (function () {
     const ua = window.navigator.userAgent;
     const isIOS = /iphone|ipad|ipod/i.test(ua);
