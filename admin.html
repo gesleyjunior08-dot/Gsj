@@ -56,7 +56,7 @@
   h1 { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: clamp(24px, 5vw, 30px); margin: 0 0 6px; }
   .tagline { color: var(--text-muted); font-size: 14.5px; margin: 0 0 30px; }
 
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 24px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 24px; }
   .card h2 { font-family: "Newsreader", ui-serif, Georgia, serif; font-size: 18px; margin: 0 0 4px; }
   .card .sub { font-size: 13px; color: var(--text-muted); margin: 0 0 16px; }
 
@@ -77,8 +77,11 @@
 <body>
   <div class="app" id="gsjPageRoot">
     <div class="wrap">
-      <h1>Admin</h1>
-      <p class="tagline">Aprovação de contas e log de atividade da equipe.</p>
+      <div class="gsj-hero">
+        <span class="eyebrow">Somente administradores</span>
+        <h1>Admin</h1>
+        <p class="tagline">Aprovação de contas e log de atividade da equipe.</p>
+      </div>
 
       <div id="adminRestricted" class="restricted" hidden>
         <p>Essa página é só pra administradores.</p>
@@ -119,7 +122,7 @@
   }
   var FERRAMENTA_LABEL = {
     orcamento: "Orçamento", contrato: "Contrato", recibo: "Recibo",
-    termo: "Termo de Entrega", plano: "Plano de Cortes"
+    termo: "Termo de Entrega", plano: "Plano de Cortes", obras: "Área do cliente"
   };
 
   GSJ.boot({ page: "admin" }).then(function (user) {

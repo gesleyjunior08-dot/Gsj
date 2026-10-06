@@ -1,0 +1,936 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Área do cliente · GSJ Marcenaria</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#954f14">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GSJ">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Source+Sans+3:wght@400;500;600;700&display=swap">
+<style>
+  html { color-scheme: light dark; }
+  body { margin: 0; }
+
+  :root {
+    --bg: #faf6ef; --surface: #ffffff; --surface-2: #fffdf9;
+    --text: #2b2118; --text-muted: #6b5d4f;
+    --accent: #954f14; --accent-2: #c9832e; --accent-soft: #f4e9da;
+    --line: #e3d9c8; --danger: #a6402f; --danger-soft: #f4e1dc;
+    --ok: #3f7d4a; --ok-soft: #e3f0e4;
+    --shadow: 0 1px 2px rgba(43, 33, 24, 0.05), 0 12px 32px rgba(43, 33, 24, 0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
+      --text: #efe7da; --text-muted: #b3a591;
+      --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
+      --line: #3c3226; --danger: #d97d68; --danger-soft: #3a241f;
+      --ok: #7dbb86; --ok-soft: #223027;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
+    --text: #efe7da; --text-muted: #b3a591;
+    --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
+    --line: #3c3226; --danger: #d97d68; --danger-soft: #3a241f;
+    --ok: #7dbb86; --ok-soft: #223027;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--text);
+    font: inherit; font-weight: 600; font-size: 13.5px; padding: 8px 13px; cursor: pointer;
+    text-decoration: none; white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-ghost { background: transparent; }
+  .btn-danger { background: var(--danger-soft); border-color: var(--danger); color: var(--danger); }
+  .btn-sm { padding: 5px 10px; font-size: 12.5px; }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 36px 24px 70px; }
+  h1 { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: clamp(24px, 5vw, 30px); margin: 0 0 6px; }
+  .tagline { color: var(--text-muted); font-size: 14.5px; margin: 0 0 22px; max-width: 60ch; }
+  .head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 22px; }
+  .card h2 { font-family: "Newsreader", ui-serif, Georgia, serif; font-size: 18px; margin: 0 0 4px; }
+  .card .sub { font-size: 13px; color: var(--text-muted); margin: 0 0 16px; }
+  .empty { color: var(--text-muted); font-size: 13.5px; padding: 6px 0; }
+
+  /* lista de obras */
+  .obra-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .obra-card {
+    display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 16px; overflow: hidden; cursor: pointer; text-align: left; padding: 0; font: inherit; color: inherit;
+    box-shadow: var(--shadow);
+  }
+  .obra-card:hover { border-color: var(--accent-2); }
+  .obra-cover { height: 120px; background: var(--accent-soft) center / cover no-repeat; display: flex; align-items: center; justify-content: center; font-size: 34px; }
+  .obra-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .obra-title { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 17px; }
+  .obra-meta { font-size: 13px; color: var(--text-muted); }
+
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; background: var(--accent-soft); color: var(--accent); }
+  .badge-ok { background: var(--ok-soft); color: var(--ok); }
+  .badge-warn { background: var(--danger-soft); color: var(--danger); }
+
+  .bar { height: 9px; border-radius: 999px; background: var(--accent-soft); overflow: hidden; }
+  .bar > span { display: block; height: 100%; background: var(--accent-2); border-radius: 999px; transition: width 0.3s; }
+  .bar.ok > span { background: var(--ok); }
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-row .bar { flex: 1; }
+  .bar-row .pct { font-weight: 700; font-size: 13px; min-width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* formulários */
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+  .field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+  .field input, .field select, .field textarea, .inline-input {
+    width: 100%; padding: 9px 11px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--surface-2); color: var(--text); font: inherit; font-size: 14px;
+  }
+  .field textarea { min-height: 76px; resize: vertical; }
+  .field.full { grid-column: 1 / -1; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+
+  /* progresso no topo do detalhe */
+  .hero-progress { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 4px; }
+  .hero-progress .hero-pct, .hero-pct { color: inherit; font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 44px; line-height: 1; }
+  .hero-progress .bar { flex: 1; min-width: 160px; height: 12px; }
+
+  /* etapas */
+  .etapa { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .etapa:last-child { border-bottom: none; }
+  .etapa .nome { flex: 1; min-width: 140px; }
+  .etapa .quando { font-size: 12px; color: var(--text-muted); min-width: 78px; }
+  .st-btn { min-width: 118px; }
+  .st-pendente { color: var(--text-muted); }
+  .st-andamento { background: var(--accent-soft); border-color: var(--accent-2); color: var(--accent); }
+  .st-concluida { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+
+  /* fotos */
+  .foto-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; margin-top: 14px; }
+  .foto { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface-2); display: flex; flex-direction: column; }
+  .foto img { width: 100%; height: 140px; object-fit: cover; display: block; cursor: zoom-in; background: var(--accent-soft); }
+  .foto-info { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; }
+  .foto-info .inline-input { padding: 5px 8px; font-size: 12.5px; }
+  .foto-actions { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .check { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-muted); cursor: pointer; }
+  .upload-zone {
+    border: 2px dashed var(--line); border-radius: 14px; padding: 16px; text-align: center;
+    color: var(--text-muted); font-size: 13.5px; background: var(--surface-2);
+  }
+  .upload-zone.drag { border-color: var(--accent-2); background: var(--accent-soft); }
+  .upload-status { font-size: 12.5px; color: var(--text-muted); margin-top: 8px; min-height: 18px; }
+
+  /* diário / mensagens */
+  .post { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .post:last-child { border-bottom: none; }
+  .post .when { font-size: 12px; color: var(--text-muted); margin-bottom: 3px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .post .txt { white-space: pre-wrap; font-size: 14px; line-height: 1.5; }
+  .reply-box { margin-top: 8px; padding: 9px 11px; background: var(--accent-soft); border-radius: 10px; font-size: 13.5px; }
+  .unread-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); }
+
+  .link-box { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .link-box input { flex: 1; min-width: 220px; padding: 9px 11px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font: inherit; font-size: 13px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 200;
+    background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 13.5px; box-shadow: var(--shadow);
+  }
+  .lightbox { position: fixed; inset: 0; z-index: 150; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; flex-direction: column; gap: 10px; }
+  .lightbox img { max-width: 100%; max-height: 85vh; border-radius: 8px; }
+  .lightbox p { color: #fff; margin: 0; font-size: 14px; }
+
+  [hidden] { display: none !important; }
+  @media (max-width: 520px) { .wrap { padding: 20px 16px 60px; } .card { padding: 16px; } }
+</style>
+</head>
+<body>
+  <div class="app" id="gsjPageRoot">
+    <div class="wrap">
+
+      <!-- LISTA -->
+      <section id="viewList">
+        <div class="gsj-hero">
+          <div class="hero-row">
+            <div>
+              <span class="eyebrow">Acompanhamento de obras</span>
+              <h1>Área do cliente</h1>
+              <p class="tagline">Acompanhe cada obra: etapas, progresso, fotos e recados. Cada obra pode ter um login só pro cliente acompanhar — ele vê apenas a obra dele.</p>
+            </div>
+            <button type="button" class="btn btn-primary" id="newObraBtn">+ Nova obra</button>
+          </div>
+        </div>
+        <div id="obraList"><p class="empty">Carregando…</p></div>
+      </section>
+
+      <!-- DETALHE -->
+      <section id="viewDetail" hidden>
+        <div class="gsj-hero">
+          <div class="hero-row">
+            <div>
+              <button type="button" class="btn btn-sm" id="backBtn" style="margin-bottom:12px;">← Todas as obras</button>
+              <h1 id="dTitle">Obra</h1>
+              <p class="tagline" id="dSub"></p>
+            </div>
+            <span class="badge" id="dStatusBadge"></span>
+          </div>
+          <div class="hero-progress" style="margin-top:18px;">
+            <div class="hero-pct" id="dPct">0%</div>
+            <div class="bar" id="dBar"><span style="width:0%"></span></div>
+          </div>
+          <p class="sub" id="dPrazo" style="margin:12px 0 0;color:rgba(255,255,255,0.84);"></p>
+        </div>
+
+        <div class="card" id="cardAcesso">
+          <h2>Acesso do cliente</h2>
+          <p class="sub">O cliente entra com um usuário e senha só dele e vê apenas esta obra: progresso, etapas, fotos e novidades que você marcar como visíveis. Ele não enxerga mais nada do sistema.</p>
+          <div id="acessoList"></div>
+          <div class="form-grid" style="margin-top:14px;">
+            <div class="field"><label for="acUser">Usuário do cliente (sem espaço/acento)</label><input id="acUser" autocapitalize="off" autocomplete="off" /></div>
+            <div class="field"><label for="acPass">Senha (mín. 6 caracteres)</label><input id="acPass" autocomplete="off" /></div>
+          </div>
+          <p class="obra-meta" style="margin:6px 0 0;">Se o usuário já existir (cliente com mais de uma obra), ele só é ligado a esta obra e a senha dele continua a mesma.</p>
+          <div class="actions">
+            <button type="button" class="btn btn-sm" id="acGenBtn">Gerar senha</button>
+            <button type="button" class="btn btn-primary" id="acCreateBtn">Criar acesso</button>
+          </div>
+          <div class="reply-box" id="acResult" hidden>
+            <strong id="acResultTitle">Acesso criado</strong>
+            <p style="margin:6px 0;" class="obra-meta">Guarde a senha agora — depois ela não aparece mais (só dá pra gerar uma nova).</p>
+            <textarea class="inline-input" id="acResultMsg" readonly rows="5" style="margin:6px 0;"></textarea>
+            <div class="actions" style="margin-top:6px;">
+              <button type="button" class="btn btn-sm" id="acCopyBtn">Copiar mensagem</button>
+              <a class="btn btn-sm btn-primary" id="acWaBtn" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Dados da obra</h2>
+          <p class="sub">Informações que aparecem pro cliente: nome, título, datas e o recado de boas-vindas.</p>
+          <div class="form-grid">
+            <div class="field"><label for="fCliente">Cliente</label><input id="fCliente" /></div>
+            <div class="field"><label for="fTitulo">Título (ex.: Cozinha planejada)</label><input id="fTitulo" /></div>
+            <div class="field"><label for="fTel">WhatsApp do cliente</label><input id="fTel" inputmode="tel" placeholder="(11) 90000-0000" /></div>
+            <div class="field"><label for="fEnd">Endereço da obra</label><input id="fEnd" /></div>
+            <div class="field"><label for="fInicio">Início</label><input id="fInicio" type="date" /></div>
+            <div class="field"><label for="fPrazo">Previsão de entrega</label><input id="fPrazo" type="date" /></div>
+            <div class="field"><label for="fStatus">Situação</label>
+              <select id="fStatus">
+                <option value="aprovado">Aprovado, ainda não começou</option>
+                <option value="em_andamento">Em andamento</option>
+                <option value="pausado">Pausado</option>
+                <option value="concluido">Concluído</option>
+              </select>
+            </div>
+            <div class="field full"><label for="fMsg">Recado pro cliente (aparece no topo da página dele)</label><textarea id="fMsg" placeholder="Ex.: Oi, Maria! Aqui você acompanha cada passo do seu projeto. Qualquer dúvida é só mandar um recado."></textarea></div>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn btn-primary" id="saveDadosBtn">Salvar dados</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Etapas e progresso</h2>
+          <p class="sub">Toque no botão de cada etapa pra mudar entre pendente, em andamento e concluída. A porcentagem é calculada sozinha (em andamento vale meia etapa).</p>
+          <div id="etapasList"></div>
+          <div class="actions">
+            <input class="inline-input" id="novaEtapa" placeholder="Nova etapa (ex.: Instalação de iluminação)" style="max-width:340px;" />
+            <button type="button" class="btn" id="addEtapaBtn">Adicionar etapa</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Fotos da obra</h2>
+          <p class="sub">Envie fotos do andamento. Elas são reduzidas automaticamente pra não pesar no celular do cliente.</p>
+          <div class="upload-zone" id="uploadZone">
+            <p style="margin:0 0 10px;">Arraste fotos aqui ou escolha da galeria / câmera</p>
+            <input type="file" id="fotoInput" accept="image/*" multiple hidden />
+            <button type="button" class="btn btn-primary" id="pickFotoBtn">Escolher fotos</button>
+            <div class="upload-status" id="uploadStatus"></div>
+          </div>
+          <div class="foto-grid" id="fotoGrid"></div>
+        </div>
+
+        <div class="card">
+          <h2>Novidades da obra</h2>
+          <p class="sub">Escreva um recado curto sobre o andamento (ex.: "Móveis cortados, começamos a montagem amanhã"). O cliente vê na linha do tempo da página dele.</p>
+          <div class="field"><textarea id="novoUpdate" placeholder="O que aconteceu hoje?"></textarea></div>
+          <div class="actions">
+            <button type="button" class="btn btn-primary" id="postUpdateBtn">Publicar</button>
+            <label class="check"><input type="checkbox" id="updVisivel" checked /> Visível pro cliente (desmarque pra ficar só como anotação interna)</label>
+          </div>
+          <div id="updateList" style="margin-top:12px;"></div>
+        </div>
+
+        <div class="card">
+          <h2>Recados do cliente <span id="msgBadge" class="badge badge-warn" hidden></span></h2>
+          <p class="sub">Mensagens e aprovações que o cliente manda pela página dele. Sua resposta aparece lá também.</p>
+          <div id="msgList"></div>
+        </div>
+
+        <div class="card" style="border-color: var(--danger);">
+          <h2>Excluir obra</h2>
+          <p class="sub">Apaga a obra, as fotos, as novidades e os recados. O login do cliente deixa de funcionar. Não tem como desfazer.</p>
+          <button type="button" class="btn btn-danger" id="deleteObraBtn">Excluir esta obra</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+<link rel="stylesheet" href="./shell.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./auth.js"></script>
+<script>
+  var sb = window.GSJ.sb;
+  var BUCKET = "gsj-obras";
+  var ETAPAS_PADRAO = ["Medição", "Projeto aprovado", "Compra de material", "Corte", "Montagem na oficina", "Acabamento", "Entrega", "Instalação"];
+  var STATUS_LABEL = { aprovado: "Aprovado", em_andamento: "Em andamento", pausado: "Pausado", concluido: "Concluído" };
+  var STATUS_CLASS = { aprovado: "badge", em_andamento: "badge", pausado: "badge badge-warn", concluido: "badge badge-ok" };
+  var ST_LABEL = { pendente: "Pendente", andamento: "Em andamento", concluida: "Concluída" };
+  var ST_NEXT = { pendente: "andamento", andamento: "concluida", concluida: "pendente" };
+
+  var obras = [];
+  var current = null;      // obra aberta
+  var fotos = [];
+  var updates = [];
+  var mensagens = [];
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function fmtDt(iso) {
+    if (!iso) return "—";
+    try { return new Date(iso).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); } catch (e) { return iso; }
+  }
+  function fmtDate(d) {
+    if (!d) return "—";
+    var p = String(d).slice(0, 10).split("-");
+    return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : d;
+  }
+  function todayISO() { return new Date().toISOString().slice(0, 10); }
+  function uid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return "id" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+  var toastTimer = null;
+  function toast(msg) {
+    var t = document.querySelector(".toast");
+    if (!t) { t = document.createElement("div"); t.className = "toast"; document.body.appendChild(t); }
+    t.textContent = msg;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { if (t.parentNode) t.remove(); }, 2600);
+  }
+  // URL de foto: assinada (vale 1h) quando dá; se falhar, cai no endereço público do bucket
+  var urlMap = {};
+  function fotoUrl(path) {
+    return urlMap[path] || sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+  function signUrls(paths) {
+    var need = paths.filter(function (p) { return !urlMap[p]; });
+    if (!need.length) return Promise.resolve();
+    return sb.storage.from(BUCKET).createSignedUrls(need, 3600).then(function (res) {
+      (res.data || []).forEach(function (r) { if (r && r.signedUrl && !r.error) urlMap[r.path] = r.signedUrl; });
+    }, function () {});
+  }
+
+  function calcPct(etapas) {
+    if (!etapas || !etapas.length) return 0;
+    var pts = 0;
+    etapas.forEach(function (e) { pts += e.status === "concluida" ? 1 : (e.status === "andamento" ? 0.5 : 0); });
+    return Math.round((pts / etapas.length) * 100);
+  }
+  function etapasPadrao() {
+    return ETAPAS_PADRAO.map(function (n) { return { id: uid(), nome: n, status: "pendente", data: null }; });
+  }
+  // ------------------------------------------------------------------ LISTA
+  function loadList() {
+    var box = $("obraList");
+    box.innerHTML = '<p class="empty">Carregando…</p>';
+    Promise.all([
+      sb.from("gsj_obras").select("*").order("created_at", { ascending: false }),
+      sb.from("gsj_obra_mensagens").select("obra_id").eq("lida", false),
+      sb.from("gsj_obra_fotos").select("obra_id,path").order("created_at", { ascending: false }).limit(300)
+    ]).then(function (r) {
+      if (r[0].error) { box.innerHTML = '<p class="empty">Não deu pra carregar agora — verifique a internet e tente de novo.</p>'; return; }
+      obras = r[0].data || [];
+      var unread = {};
+      (r[1].data || []).forEach(function (m) { unread[m.obra_id] = (unread[m.obra_id] || 0) + 1; });
+      var cover = {};
+      (r[2].data || []).forEach(function (f) { if (!cover[f.obra_id]) cover[f.obra_id] = f.path; });
+      return signUrls(Object.keys(cover).map(function (k) { return cover[k]; })).then(function () { renderList(box, unread, cover); });
+    }).catch(function () {
+      box.innerHTML = '<p class="empty">Não deu pra carregar agora — verifique a internet e tente de novo.</p>';
+    });
+  }
+
+  function renderList(box, unread, cover) {
+    {
+      if (!obras.length) {
+        box.innerHTML = '<div class="card"><p class="empty" style="font-size:14.5px;">Nenhuma obra cadastrada ainda. Toque em <strong>+ Nova obra</strong> pra criar a primeira — ela já vem com as etapas padrão de marcenaria (medição, corte, montagem, entrega…).</p></div>';
+        return;
+      }
+      var html = '<div class="obra-grid">';
+      obras.forEach(function (o) {
+        var pct = calcPct(o.etapas);
+        var bg = cover[o.id] ? ' style="background-image:url(\'' + esc(fotoUrl(cover[o.id])) + '\')"' : "";
+        html += '<button type="button" class="obra-card" data-id="' + o.id + '">' +
+          '<div class="obra-cover"' + bg + '>' + (cover[o.id] ? "" : "🪚") + '</div>' +
+          '<div class="obra-body">' +
+            '<div class="obra-title">' + esc(o.titulo) + '</div>' +
+            '<div class="obra-meta">' + esc(o.cliente_nome) + '</div>' +
+            '<div class="bar-row"><div class="bar' + (pct === 100 ? " ok" : "") + '"><span style="width:' + pct + '%"></span></div><span class="pct">' + pct + '%</span></div>' +
+            '<div class="obra-meta"><span class="' + STATUS_CLASS[o.status] + '">' + STATUS_LABEL[o.status] + '</span>' +
+              (o.prazo_entrega ? " · entrega " + fmtDate(o.prazo_entrega) : "") +
+              (unread[o.id] ? ' · <span class="unread-dot"></span> ' + unread[o.id] + " recado" + (unread[o.id] > 1 ? "s" : "") : "") +
+            '</div>' +
+          '</div></button>';
+      });
+      html += "</div>";
+      box.innerHTML = html;
+      box.querySelectorAll(".obra-card").forEach(function (b) {
+        b.addEventListener("click", function () { openObra(b.getAttribute("data-id")); });
+      });
+    }
+  }
+
+  $("newObraBtn").addEventListener("click", function () {
+    var cliente = prompt("Nome do cliente:");
+    if (!cliente || !cliente.trim()) return;
+    var titulo = prompt("Título da obra (ex.: Cozinha planejada):", "Móveis planejados");
+    if (!titulo || !titulo.trim()) return;
+    sb.from("gsj_obras").insert({
+      cliente_nome: cliente.trim(), titulo: titulo.trim(), etapas: etapasPadrao(), data_inicio: todayISO(),
+      mensagem_cliente: "Olá, " + cliente.trim().split(" ")[0] + "! Aqui você acompanha cada passo do seu projeto — etapas, fotos e novidades. Qualquer dúvida, é só mandar um recado."
+    }).select().single().then(function (res) {
+      if (res.error || !res.data) { toast("Não deu pra criar a obra agora."); return; }
+      GSJ.logAction("criar", "obras", cliente.trim() + " — " + titulo.trim());
+      openObra(res.data.id, res.data);
+    });
+  });
+
+  // ---------------------------------------------------------------- DETALHE
+  function showList() {
+    current = null;
+    $("viewDetail").hidden = true;
+    $("viewList").hidden = false;
+    loadList();
+  }
+  $("backBtn").addEventListener("click", showList);
+
+  function openObra(id, row) {
+    function go(o) {
+      current = o;
+      fotos = []; updates = []; mensagens = [];
+      $("viewList").hidden = true;
+      $("viewDetail").hidden = false;
+      window.scrollTo(0, 0);
+      fillDetail();
+      $("acResult").hidden = true;
+      $("acPass").value = "";
+      $("acUser").value = slug((o.cliente_nome || "").split(" ")[0]) + String(Math.floor(10 + Math.random() * 90));
+      loadFotos(); loadUpdates(); loadMensagens(); loadAcessos();
+      GSJ.logAction("abrir", "obras", o.cliente_nome + " — " + o.titulo);
+    }
+    if (row) { go(row); return; }
+    sb.from("gsj_obras").select("*").eq("id", id).single().then(function (res) {
+      if (res.error || !res.data) { toast("Não deu pra abrir essa obra."); return; }
+      go(res.data);
+    });
+  }
+
+  function fillDetail() {
+    var o = current;
+    $("dTitle").textContent = o.titulo;
+    $("dSub").textContent = o.cliente_nome + (o.endereco ? " · " + o.endereco : "");
+    $("fCliente").value = o.cliente_nome || "";
+    $("fTitulo").value = o.titulo || "";
+    $("fTel").value = o.telefone_cliente || "";
+    $("fEnd").value = o.endereco || "";
+    $("fInicio").value = o.data_inicio || "";
+    $("fPrazo").value = o.prazo_entrega || "";
+    $("fStatus").value = o.status;
+    $("fMsg").value = o.mensagem_cliente || "";
+    renderHeader();
+    renderEtapas();
+    renderAcessos();
+  }
+
+  function renderHeader() {
+    var o = current;
+    var pct = calcPct(o.etapas);
+    $("dPct").textContent = pct + "%";
+    var bar = $("dBar");
+    bar.className = "bar" + (pct === 100 ? " ok" : "");
+    bar.firstElementChild.style.width = pct + "%";
+    var sb_ = $("dStatusBadge");
+    sb_.className = STATUS_CLASS[o.status];
+    sb_.textContent = STATUS_LABEL[o.status];
+    var txt = "Início: " + fmtDate(o.data_inicio) + " · Previsão de entrega: " + fmtDate(o.prazo_entrega);
+    if (o.prazo_entrega && o.status !== "concluido") {
+      var dias = Math.ceil((new Date(o.prazo_entrega + "T12:00:00") - new Date()) / 86400000);
+      txt += dias >= 0 ? " (faltam " + dias + " dia" + (dias === 1 ? "" : "s") + ")" : " (atrasada " + (-dias) + " dia" + (dias === -1 ? "" : "s") + ")";
+    }
+    $("dPrazo").textContent = txt;
+  }
+
+  function patchObra(fields, okMsg) {
+    fields.updated_at = new Date().toISOString();
+    return sb.from("gsj_obras").update(fields).eq("id", current.id).select().single().then(function (res) {
+      if (res.error || !res.data) { toast("Não deu pra salvar agora."); return false; }
+      current = res.data;
+      if (okMsg) toast(okMsg);
+      return true;
+    });
+  }
+
+  $("saveDadosBtn").addEventListener("click", function () {
+    var cliente = $("fCliente").value.trim(), titulo = $("fTitulo").value.trim();
+    if (!cliente || !titulo) { toast("Preencha o nome do cliente e o título."); return; }
+    var btn = $("saveDadosBtn"); btn.disabled = true;
+    patchObra({
+      cliente_nome: cliente, titulo: titulo,
+      telefone_cliente: $("fTel").value.trim() || null,
+      endereco: $("fEnd").value.trim() || null,
+      data_inicio: $("fInicio").value || null,
+      prazo_entrega: $("fPrazo").value || null,
+      status: $("fStatus").value,
+      mensagem_cliente: $("fMsg").value.trim() || null
+    }, "Dados salvos").then(function (ok) {
+      btn.disabled = false;
+      if (ok) { GSJ.logAction("salvar", "obras", current.cliente_nome + " — " + current.titulo); fillDetail(); }
+    });
+  });
+
+  // ---- etapas
+  function renderEtapas() {
+    var box = $("etapasList");
+    var et = current.etapas || [];
+    if (!et.length) { box.innerHTML = '<p class="empty">Sem etapas. Adicione a primeira abaixo.</p>'; return; }
+    box.innerHTML = et.map(function (e, i) {
+      return '<div class="etapa" data-i="' + i + '">' +
+        '<input class="inline-input nome" value="' + esc(e.nome) + '" data-act="rename" aria-label="Nome da etapa" />' +
+        '<span class="quando">' + (e.status === "concluida" && e.data ? fmtDate(e.data) : "") + '</span>' +
+        '<button type="button" class="btn btn-sm st-btn st-' + e.status + '" data-act="cycle">' + ST_LABEL[e.status] + '</button>' +
+        '<button type="button" class="btn btn-sm" data-act="up" aria-label="Subir"' + (i === 0 ? " disabled" : "") + '>↑</button>' +
+        '<button type="button" class="btn btn-sm" data-act="down" aria-label="Descer"' + (i === et.length - 1 ? " disabled" : "") + '>↓</button>' +
+        '<button type="button" class="btn btn-sm btn-danger" data-act="del" aria-label="Remover etapa">✕</button>' +
+        '</div>';
+    }).join("");
+  }
+
+  function saveEtapas(msg) {
+    return patchObra({ etapas: current.etapas }, msg).then(function (ok) { if (ok) { renderHeader(); renderEtapas(); } return ok; });
+  }
+
+  $("etapasList").addEventListener("click", function (ev) {
+    var btn = ev.target.closest("[data-act]");
+    if (!btn || btn.tagName === "INPUT") return;
+    var row = btn.closest(".etapa"); var i = Number(row.getAttribute("data-i"));
+    var et = current.etapas.slice();
+    var act = btn.getAttribute("data-act");
+    if (act === "cycle") {
+      var next = ST_NEXT[et[i].status];
+      et[i] = Object.assign({}, et[i], { status: next, data: next === "concluida" ? todayISO() : null });
+    } else if (act === "up" && i > 0) { var t = et[i - 1]; et[i - 1] = et[i]; et[i] = t; }
+    else if (act === "down" && i < et.length - 1) { var t2 = et[i + 1]; et[i + 1] = et[i]; et[i] = t2; }
+    else if (act === "del") {
+      if (!confirm('Remover a etapa "' + et[i].nome + '"?')) return;
+      et.splice(i, 1);
+    } else return;
+    current.etapas = et;
+    saveEtapas();
+  });
+  $("etapasList").addEventListener("change", function (ev) {
+    if (ev.target.getAttribute("data-act") !== "rename") return;
+    var i = Number(ev.target.closest(".etapa").getAttribute("data-i"));
+    var nome = ev.target.value.trim();
+    if (!nome) { renderEtapas(); return; }
+    var et = current.etapas.slice();
+    et[i] = Object.assign({}, et[i], { nome: nome });
+    current.etapas = et;
+    saveEtapas("Etapa renomeada");
+  });
+  $("addEtapaBtn").addEventListener("click", function () {
+    var nome = $("novaEtapa").value.trim();
+    if (!nome) return;
+    current.etapas = (current.etapas || []).concat([{ id: uid(), nome: nome, status: "pendente", data: null }]);
+    $("novaEtapa").value = "";
+    saveEtapas();
+  });
+  $("novaEtapa").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); $("addEtapaBtn").click(); } });
+
+  // ---- acesso do cliente (login próprio)
+  var acessos = [];
+
+  function slug(txt) {
+    return String(txt || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  }
+  function genPassword() {
+    var chars = "abcdefghjkmnpqrstuvwxyz23456789", a = new Uint8Array(8), out = "";
+    crypto.getRandomValues(a);
+    for (var i = 0; i < a.length; i++) out += chars[a[i] % chars.length];
+    return out;
+  }
+  function portalUrl() { return new URL("cliente.html", location.href).href; }
+
+  // chama a Edge Function que cria/gerencia logins de cliente (só a equipe aprovada consegue)
+  function callClientes(payload) {
+    return sb.functions.invoke("gsj-clientes", { body: payload }).then(function (res) {
+      if (!res.error) return { ok: true, data: res.data };
+      var ctx = res.error.context;
+      if (ctx && typeof ctx.json === "function") {
+        return ctx.json().then(function (j) { return { ok: false, error: (j && j.error) || "Não deu pra concluir agora." }; },
+                               function () { return { ok: false, error: "Não deu pra concluir agora." }; });
+      }
+      return { ok: false, error: "Não deu pra concluir agora — verifique a internet." };
+    }, function () { return { ok: false, error: "Não deu pra concluir agora — verifique a internet." }; });
+  }
+
+  function loadAcessos() {
+    sb.from("gsj_cliente_acessos").select("*").eq("obra_id", current.id).order("created_at", { ascending: true }).then(function (res) {
+      acessos = res.data || [];
+      renderAcessos();
+    });
+  }
+  function renderAcessos() {
+    var box = $("acessoList");
+    if (!acessos.length) { box.innerHTML = '<p class="empty">Nenhum acesso criado ainda. Crie abaixo o usuário e a senha do cliente.</p>'; return; }
+    box.innerHTML = acessos.map(function (a) {
+      return '<div class="post" data-id="' + a.id + '"><div class="when"><strong>@' + esc(a.username) + "</strong>" +
+        (a.nome && a.nome !== a.username ? " · " + esc(a.nome) : "") +
+        ' <span class="badge ' + (a.ativo ? "badge-ok" : "badge-warn") + '">' + (a.ativo ? "ativo" : "bloqueado") + "</span>" +
+        " · último acesso: " + (a.ultimo_acesso ? fmtDt(a.ultimo_acesso) : "ainda não entrou") + "</div>" +
+        '<div class="actions" style="margin-top:6px;">' +
+          '<button type="button" class="btn btn-sm" data-act="pass">Nova senha</button>' +
+          '<button type="button" class="btn btn-sm" data-act="toggle">' + (a.ativo ? "Bloquear" : "Reativar") + "</button>" +
+          '<button type="button" class="btn btn-sm btn-danger" data-act="remove">Remover</button>' +
+        "</div></div>";
+    }).join("");
+  }
+
+  function showAcessoResult(titulo, username, senha) {
+    var nome = (current.cliente_nome || "").split(" ")[0];
+    var msg = "Olá, " + nome + "! Aqui está o acesso pra você acompanhar o andamento do seu projeto com a GSJ Marcenaria (etapas, fotos e novidades):\n\n" +
+      "Endereço: " + portalUrl() + "\nUsuário: " + username + (senha ? "\nSenha: " + senha : "\n(a senha é a mesma que você já usa)");
+    $("acResultTitle").textContent = titulo;
+    $("acResultMsg").value = msg;
+    var digits = String(current.telefone_cliente || "").replace(/\D/g, "");
+    if (digits.length === 10 || digits.length === 11) digits = "55" + digits;
+    $("acWaBtn").href = "https://wa.me/" + digits + "?text=" + encodeURIComponent(msg);
+    $("acResult").hidden = false;
+  }
+
+  $("acGenBtn").addEventListener("click", function () { $("acPass").value = genPassword(); });
+  $("acCreateBtn").addEventListener("click", function () {
+    var username = $("acUser").value.trim().toLowerCase().replace(/[^a-z0-9._-]/g, "");
+    var pass = $("acPass").value;
+    if (username.length < 3) { toast("Usuário com pelo menos 3 letras/números."); return; }
+    var btn = $("acCreateBtn"); btn.disabled = true;
+    callClientes({ action: "create", obra_id: current.id, username: username, password: pass, nome: current.cliente_nome }).then(function (r) {
+      btn.disabled = false;
+      if (!r.ok) { toast(r.error); return; }
+      GSJ.logAction("acesso-cliente", "obras", current.cliente_nome + " — @" + username);
+      showAcessoResult(r.data && r.data.ligado ? "Login existente ligado a esta obra" : "Acesso criado", username, r.data && r.data.ligado ? "" : pass);
+      $("acPass").value = "";
+      loadAcessos();
+    });
+  });
+  $("acCopyBtn").addEventListener("click", function () {
+    var ta = $("acResultMsg");
+    var done = function () { toast("Mensagem copiada"); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, function () { ta.select(); document.execCommand("copy"); done(); });
+    else { ta.select(); document.execCommand("copy"); done(); }
+  });
+
+  $("acessoList").addEventListener("click", function (ev) {
+    var btn = ev.target.closest("[data-act]");
+    if (!btn) return;
+    var id = btn.closest(".post").getAttribute("data-id");
+    var a = acessos.filter(function (x) { return x.id === id; })[0];
+    if (!a) return;
+    var act = btn.getAttribute("data-act");
+    if (act === "toggle") {
+      sb.from("gsj_cliente_acessos").update({ ativo: !a.ativo }).eq("id", id).then(function (res) {
+        if (res.error) { toast("Não deu pra salvar agora."); return; }
+        a.ativo = !a.ativo; renderAcessos();
+        toast(a.ativo ? "Acesso reativado" : "Acesso bloqueado");
+      });
+    } else if (act === "pass") {
+      var nova = prompt("Nova senha para @" + a.username + " (mín. 6 caracteres):", genPassword());
+      if (!nova) return;
+      btn.disabled = true;
+      callClientes({ action: "set_password", acesso_id: id, password: nova }).then(function (r) {
+        btn.disabled = false;
+        if (!r.ok) { toast(r.error); return; }
+        showAcessoResult("Senha redefinida", a.username, nova);
+      });
+    } else if (act === "remove") {
+      if (!confirm("Remover o acesso de @" + a.username + " a esta obra? Se for a única obra dele, o login é apagado.")) return;
+      btn.disabled = true;
+      callClientes({ action: "remove", acesso_id: id }).then(function (r) {
+        if (!r.ok) { btn.disabled = false; toast(r.error); return; }
+        acessos = acessos.filter(function (x) { return x.id !== id; });
+        renderAcessos();
+        toast("Acesso removido");
+      });
+    }
+  });
+
+  // ---- fotos
+  function loadFotos() {
+    sb.from("gsj_obra_fotos").select("*").eq("obra_id", current.id).order("created_at", { ascending: false }).then(function (res) {
+      fotos = res.data || [];
+      signUrls(fotos.map(function (f) { return f.path; })).then(renderFotos);
+    });
+  }
+  function renderFotos() {
+    var grid = $("fotoGrid");
+    if (!fotos.length) { grid.innerHTML = '<p class="empty" style="grid-column:1/-1;">Nenhuma foto ainda.</p>'; return; }
+    var etapaOpts = '<option value="">Sem etapa</option>' + (current.etapas || []).map(function (e) {
+      return '<option value="' + esc(e.nome) + '">' + esc(e.nome) + "</option>";
+    }).join("");
+    grid.innerHTML = fotos.map(function (f) {
+      var opts = etapaOpts;
+      if (f.etapa && (current.etapas || []).every(function (e) { return e.nome !== f.etapa; })) {
+        opts += '<option value="' + esc(f.etapa) + '">' + esc(f.etapa) + "</option>";
+      }
+      return '<div class="foto" data-id="' + f.id + '">' +
+        '<img loading="lazy" src="' + esc(fotoUrl(f.path)) + '" alt="' + esc(f.legenda || "Foto da obra") + '" data-act="zoom" />' +
+        '<div class="foto-info">' +
+          '<input class="inline-input" data-act="legenda" placeholder="Legenda" value="' + esc(f.legenda || "") + '" />' +
+          '<select class="inline-input" data-act="etapa">' + opts.replace('value="' + esc(f.etapa || "") + '"', function (m) { return m + " selected"; }) + '</select>' +
+          '<div class="foto-actions">' +
+            '<label class="check"><input type="checkbox" data-act="visivel"' + (f.visivel_cliente ? " checked" : "") + ' /> Cliente vê</label>' +
+            '<button type="button" class="btn btn-sm btn-danger" data-act="del">Apagar</button>' +
+          '</div>' +
+          '<span class="obra-meta">' + fmtDt(f.created_at) + '</span>' +
+        '</div></div>';
+    }).join("");
+  }
+  function fotoById(el) {
+    var id = el.closest(".foto").getAttribute("data-id");
+    return fotos.filter(function (f) { return f.id === id; })[0];
+  }
+  $("fotoGrid").addEventListener("click", function (ev) {
+    var el = ev.target.closest("[data-act]");
+    if (!el) return;
+    var f = fotoById(el); if (!f) return;
+    var act = el.getAttribute("data-act");
+    if (act === "zoom") openLightbox(fotoUrl(f.path), f.legenda);
+    if (act === "del") {
+      if (!confirm("Apagar essa foto?")) return;
+      sb.storage.from(BUCKET).remove([f.path]).then(function () {
+        return sb.from("gsj_obra_fotos").delete().eq("id", f.id);
+      }).then(function (res) {
+        if (res && res.error) { toast("Não deu pra apagar agora."); return; }
+        fotos = fotos.filter(function (x) { return x.id !== f.id; });
+        renderFotos();
+      });
+    }
+  });
+  $("fotoGrid").addEventListener("change", function (ev) {
+    var el = ev.target.closest("[data-act]");
+    if (!el) return;
+    var f = fotoById(el); if (!f) return;
+    var act = el.getAttribute("data-act"), patch = null;
+    if (act === "legenda") patch = { legenda: el.value.trim() || null };
+    if (act === "etapa") patch = { etapa: el.value || null };
+    if (act === "visivel") patch = { visivel_cliente: el.checked };
+    if (!patch) return;
+    sb.from("gsj_obra_fotos").update(patch).eq("id", f.id).then(function (res) {
+      if (res.error) { toast("Não deu pra salvar agora."); return; }
+      Object.assign(f, patch);
+    });
+  });
+
+  function openLightbox(url, caption) {
+    var lb = document.createElement("div");
+    lb.className = "lightbox";
+    lb.innerHTML = '<img src="' + esc(url) + '" alt="" />' + (caption ? "<p>" + esc(caption) + "</p>" : "");
+    lb.addEventListener("click", function () { lb.remove(); });
+    document.body.appendChild(lb);
+  }
+
+  // reduz a foto no próprio aparelho antes de enviar (lado maior 1600px, JPEG)
+  function resizeImage(file, maxDim, quality) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        var w = img.naturalWidth, h = img.naturalHeight;
+        var scale = Math.min(1, maxDim / Math.max(w, h));
+        var cw = Math.round(w * scale), ch = Math.round(h * scale);
+        var canvas = document.createElement("canvas");
+        canvas.width = cw; canvas.height = ch;
+        canvas.getContext("2d").drawImage(img, 0, 0, cw, ch);
+        URL.revokeObjectURL(url);
+        canvas.toBlob(function (blob) { blob ? resolve(blob) : reject(new Error("toBlob")); }, "image/jpeg", quality);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error("img")); };
+      img.src = url;
+    });
+  }
+
+  function uploadFiles(fileList) {
+    var files = Array.prototype.filter.call(fileList, function (f) { return /^image\//.test(f.type); });
+    var status = $("uploadStatus");
+    if (!files.length) { status.textContent = "Escolha arquivos de imagem."; return; }
+    var done = 0, falhas = 0;
+    status.textContent = "Enviando 0/" + files.length + "…";
+    var chain = Promise.resolve();
+    files.forEach(function (file) {
+      chain = chain.then(function () {
+        return resizeImage(file, 1600, 0.8).then(function (blob) {
+          var path = current.id + "/" + uid() + ".jpg";
+          return sb.storage.from(BUCKET).upload(path, blob, { contentType: "image/jpeg", cacheControl: "31536000" }).then(function (up) {
+            if (up.error) throw up.error;
+            return sb.from("gsj_obra_fotos").insert({ obra_id: current.id, path: path }).then(function (ins) {
+              if (ins.error) { sb.storage.from(BUCKET).remove([path]); throw ins.error; }
+            });
+          });
+        }).then(function () { done++; }, function () { falhas++; }).then(function () {
+          status.textContent = "Enviando " + (done + falhas) + "/" + files.length + "…";
+        });
+      });
+    });
+    chain.then(function () {
+      status.textContent = falhas ? done + " enviada(s), " + falhas + " com erro — tente de novo." : done + " foto(s) enviada(s).";
+      if (done) { GSJ.logAction("foto", "obras", current.cliente_nome + " — " + done + " foto(s)"); current.updated_at = new Date().toISOString(); sb.from("gsj_obras").update({ updated_at: current.updated_at }).eq("id", current.id).then(function () {}); }
+      loadFotos();
+    });
+  }
+  $("pickFotoBtn").addEventListener("click", function () { $("fotoInput").click(); });
+  $("fotoInput").addEventListener("change", function () { uploadFiles(this.files); this.value = ""; });
+  var zone = $("uploadZone");
+  ["dragenter", "dragover"].forEach(function (n) { zone.addEventListener(n, function (e) { e.preventDefault(); zone.classList.add("drag"); }); });
+  ["dragleave", "drop"].forEach(function (n) { zone.addEventListener(n, function (e) { e.preventDefault(); zone.classList.remove("drag"); }); });
+  zone.addEventListener("drop", function (e) { if (e.dataTransfer && e.dataTransfer.files) uploadFiles(e.dataTransfer.files); });
+
+  // ---- novidades (diário)
+  function loadUpdates() {
+    sb.from("gsj_obra_updates").select("*").eq("obra_id", current.id).order("created_at", { ascending: false }).then(function (res) {
+      updates = res.data || [];
+      renderUpdates();
+    });
+  }
+  function renderUpdates() {
+    var box = $("updateList");
+    if (!updates.length) { box.innerHTML = '<p class="empty">Nenhuma novidade publicada ainda.</p>'; return; }
+    box.innerHTML = updates.map(function (u) {
+      return '<div class="post" data-id="' + u.id + '"><div class="when">' + fmtDt(u.created_at) + (u.autor ? " · @" + esc(u.autor) : "") +
+        ' <span class="badge' + (u.visivel_cliente ? " badge-ok" : "") + '">' + (u.visivel_cliente ? "cliente vê" : "só interno") + '</span>' +
+        ' <button type="button" class="btn btn-sm btn-danger" data-act="del">Apagar</button></div>' +
+        '<div class="txt">' + esc(u.texto) + "</div></div>";
+    }).join("");
+  }
+  $("postUpdateBtn").addEventListener("click", function () {
+    var txt = $("novoUpdate").value.trim();
+    if (!txt) return;
+    var btn = $("postUpdateBtn"); btn.disabled = true;
+    sb.from("gsj_obra_updates").insert({
+      obra_id: current.id, texto: txt, visivel_cliente: $("updVisivel").checked, autor: GSJ.user && GSJ.user.username
+    }).then(function (res) {
+      btn.disabled = false;
+      if (res.error) { toast("Não deu pra publicar agora."); return; }
+      $("novoUpdate").value = "";
+      sb.from("gsj_obras").update({ updated_at: new Date().toISOString() }).eq("id", current.id).then(function () {});
+      loadUpdates();
+    });
+  });
+  $("updateList").addEventListener("click", function (ev) {
+    var btn = ev.target.closest('[data-act="del"]');
+    if (!btn) return;
+    if (!confirm("Apagar essa novidade?")) return;
+    var id = btn.closest(".post").getAttribute("data-id");
+    sb.from("gsj_obra_updates").delete().eq("id", id).then(function (res) {
+      if (res.error) { toast("Não deu pra apagar agora."); return; }
+      updates = updates.filter(function (u) { return u.id !== id; });
+      renderUpdates();
+    });
+  });
+
+  // ---- recados do cliente
+  function loadMensagens() {
+    sb.from("gsj_obra_mensagens").select("*").eq("obra_id", current.id).order("created_at", { ascending: false }).then(function (res) {
+      mensagens = res.data || [];
+      renderMensagens();
+    });
+  }
+  function renderMensagens() {
+    var box = $("msgList");
+    var unread = mensagens.filter(function (m) { return !m.lida; }).length;
+    var badge = $("msgBadge");
+    badge.hidden = !unread;
+    badge.textContent = unread + " novo" + (unread > 1 ? "s" : "");
+    if (!mensagens.length) { box.innerHTML = '<p class="empty">Nenhum recado do cliente ainda.</p>'; return; }
+    box.innerHTML = mensagens.map(function (m) {
+      return '<div class="post" data-id="' + m.id + '">' +
+        '<div class="when">' + (m.lida ? "" : '<span class="unread-dot"></span>') + " " + fmtDt(m.created_at) + " · " + esc(m.nome || "Cliente") +
+          (m.tipo === "aprovacao" ? ' <span class="badge badge-ok">aprovação</span>' : "") + "</div>" +
+        '<div class="txt">' + esc(m.texto) + "</div>" +
+        (m.resposta ? '<div class="reply-box"><strong>Sua resposta</strong> (' + fmtDt(m.respondida_em) + ")<br>" + esc(m.resposta) + "</div>" : "") +
+        '<div class="actions">' +
+          '<input class="inline-input" data-reply placeholder="' + (m.resposta ? "Editar resposta…" : "Responder…") + '" style="max-width:380px;" />' +
+          '<button type="button" class="btn btn-sm btn-primary" data-act="reply">Responder</button>' +
+          (m.lida ? "" : '<button type="button" class="btn btn-sm" data-act="read">Marcar como lido</button>') +
+        "</div></div>";
+    }).join("");
+  }
+  $("msgList").addEventListener("click", function (ev) {
+    var btn = ev.target.closest("[data-act]");
+    if (!btn) return;
+    var post = btn.closest(".post"); var id = post.getAttribute("data-id");
+    var m = mensagens.filter(function (x) { return x.id === id; })[0];
+    if (!m) return;
+    var patch;
+    if (btn.getAttribute("data-act") === "read") patch = { lida: true };
+    else {
+      var txt = post.querySelector("[data-reply]").value.trim();
+      if (!txt) return;
+      patch = { resposta: txt, respondida_em: new Date().toISOString(), lida: true };
+    }
+    btn.disabled = true;
+    sb.from("gsj_obra_mensagens").update(patch).eq("id", id).then(function (res) {
+      if (res.error) { toast("Não deu pra salvar agora."); btn.disabled = false; return; }
+      Object.assign(m, patch);
+      renderMensagens();
+      if (patch.resposta) toast("Resposta enviada — o cliente vê na página dele");
+    });
+  });
+
+  // ---- excluir
+  $("deleteObraBtn").addEventListener("click", function () {
+    if (!confirm('Excluir a obra "' + current.titulo + '" de ' + current.cliente_nome + "? Isso apaga fotos, novidades e recados e não tem volta.")) return;
+    var paths = fotos.map(function (f) { return f.path; });
+    var rm = paths.length ? sb.storage.from(BUCKET).remove(paths) : Promise.resolve();
+    var removeAcessos = acessos.reduce(function (p, a) { return p.then(function () { return callClientes({ action: "remove", acesso_id: a.id }); }); }, Promise.resolve());
+    removeAcessos.then(function () { return rm; }).then(function () { return sb.from("gsj_obras").delete().eq("id", current.id); }).then(function (res) {
+      if (res.error) { toast("Não deu pra excluir agora."); return; }
+      GSJ.logAction("excluir", "obras", current.cliente_nome + " — " + current.titulo);
+      toast("Obra excluída");
+      showList();
+    });
+  });
+
+  GSJ.boot({ page: "obras" }).then(function (user) {
+    if (!user) return;
+    loadList();
+  });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("./sw.js").catch(function () {});
+    });
+  }
+</script>
+</body></html>

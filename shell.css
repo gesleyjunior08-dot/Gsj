@@ -1,93 +1,163 @@
+/* Fontes da marca (o @import só vale como PRIMEIRA regra do arquivo — por isso fica aqui no topo
+   e carrega Newsreader + Source Sans 3 em todas as páginas que usam esta casca). */
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Source+Sans+3:wght@400;500;600;700&display=swap");
+
 /* Casca do app GSJ: barra lateral, menu mobile, tela de login/cadastro/aprovação.
    Usa as mesmas variáveis de cor (--bg, --accent, etc.) já definidas em cada página.
-   Prefixo "gsj-" em tudo pra nunca colidir com o CSS interno de cada ferramenta. */
+   Prefixo "gsj-" em tudo pra nunca colidir com o CSS interno de cada ferramenta.
+   Identidade: Cobre Queimado #954F14, Âmbar #C9832E / #E8AB68, Nogueira #2B2118. */
 
 .gsj-shell { min-height: 100vh; display: flex; align-items: stretch; }
 
+/* ---------------- barra lateral (escura, com degradê sutil) ---------------- */
 .gsj-sidebar {
-  width: 248px; flex: 0 0 248px;
-  background: var(--surface); border-right: 1px solid var(--line);
+  width: 252px; flex: 0 0 252px;
+  background:
+    radial-gradient(260px 200px at 0% 0%, rgba(201, 131, 46, 0.16), transparent 70%),
+    linear-gradient(180deg, #2b2118 0%, #1f1812 100%);
+  color: #efe7da;
   display: flex; flex-direction: column;
-  padding: 18px 14px; padding-top: calc(18px + env(safe-area-inset-top, 0px));
+  padding: 20px 14px; padding-top: calc(20px + env(safe-area-inset-top, 0px));
   position: sticky; top: 0; height: 100vh; overflow-y: auto;
 }
 
 .gsj-brand {
-  display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text);
-  padding: 4px 6px 16px; border-bottom: 1px solid var(--line); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 11px; text-decoration: none; color: #fff;
+  padding: 4px 8px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 16px;
 }
 .gsj-brand .badge {
-  width: 34px; height: 34px; border-radius: 50%; background: var(--text); color: var(--accent-2);
-  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;
+  width: 36px; height: 36px; border-radius: 50%; background: #2b2118; color: #e8ab68;
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12.5px;
   font-family: "Newsreader", ui-serif, Georgia, serif; flex: none;
+  box-shadow: 0 0 0 1.5px rgba(232, 171, 104, 0.6);
 }
-.gsj-brand span.name { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 15.5px; }
+.gsj-brand span.name { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 16px; letter-spacing: 0.01em; }
 
-.gsj-nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.gsj-nav { display: flex; flex-direction: column; gap: 3px; flex: 1; }
 .gsj-nav a {
-  display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text);
+  display: flex; align-items: center; gap: 11px; text-decoration: none; color: rgba(239, 231, 218, 0.78);
   padding: 10px 12px; border-radius: 10px; font-size: 14.5px; font-weight: 500;
+  transition: background 0.15s, color 0.15s;
 }
-.gsj-nav a:hover { background: var(--accent-soft); }
-.gsj-nav a.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
-.gsj-nav .gsj-nav-sep { height: 1px; background: var(--line); margin: 10px 4px; }
-.gsj-nav .gsj-nav-admin { color: var(--text-muted); }
-.gsj-nav .gsj-nav-admin.active { color: var(--accent); }
+.gsj-nav a:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+.gsj-nav a.active {
+  background: linear-gradient(90deg, rgba(201, 131, 46, 0.34), rgba(201, 131, 46, 0.1));
+  color: #fff; font-weight: 700; box-shadow: inset 3px 0 0 #e8ab68;
+}
+.gsj-nav .gsj-nav-sep { height: 1px; background: rgba(255, 255, 255, 0.1); margin: 12px 4px; }
+.gsj-nav .gsj-nav-admin { color: rgba(239, 231, 218, 0.6); }
+.gsj-nav .gsj-nav-admin.active { color: #fff; }
 
-.gsj-sidebar-bottom { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 8px; }
-.gsj-user-info { font-size: 12.5px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4; padding: 0 4px; }
-.gsj-user-info strong { color: var(--text); display: block; font-size: 13.5px; }
+.gsj-sidebar-bottom { border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 14px; margin-top: 8px; }
+.gsj-user-info { font-size: 12.5px; color: rgba(239, 231, 218, 0.65); margin-bottom: 10px; line-height: 1.4; padding: 0 4px; }
+.gsj-user-info strong { color: #fff; display: block; font-size: 14px; }
+.gsj-sidebar .btn {
+  background: rgba(255, 255, 255, 0.08); color: #efe7da; border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.gsj-sidebar .btn:hover { background: rgba(255, 255, 255, 0.14); }
 
 .gsj-menu-btn {
   display: none; position: fixed; top: calc(14px + env(safe-area-inset-top, 0px)); left: 14px; z-index: 40;
-  width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--line);
-  background: var(--surface); color: var(--text); font-size: 18px; box-shadow: var(--shadow);
+  width: 42px; height: 42px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.18);
+  background: #2b2118; color: #fff; font-size: 18px; box-shadow: 0 6px 18px rgba(43, 33, 24, 0.35);
   align-items: center; justify-content: center;
 }
 
 .gsj-overlay {
-  position: fixed; inset: 0; background: rgba(43, 33, 24, 0.45); z-index: 30;
+  position: fixed; inset: 0; background: rgba(43, 33, 24, 0.55); z-index: 30;
 }
 
 .gsj-main { flex: 1; min-width: 0; }
+body.gsj-has-shell { margin: 0 !important; padding: 0 !important; }
+.gsj-main.gsj-tool { padding: 32px 24px 64px; }
 
 @media (max-width: 880px) {
   .gsj-menu-btn { display: flex; }
   .gsj-sidebar {
     position: fixed; top: 0; left: 0; z-index: 35; height: 100vh;
-    transform: translateX(-100%); transition: transform 0.2s ease; box-shadow: var(--shadow);
+    transform: translateX(-100%); transition: transform 0.2s ease; box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
   }
   .gsj-sidebar.open { transform: translateX(0); }
   .gsj-main { padding-top: 60px; }
+  .gsj-main.gsj-tool { padding: 72px 16px 48px; }
 }
 
-/* ---- tela de login / cadastro / aprovação pendente (substitui a antiga senha única) ---- */
+@media print {
+  .gsj-sidebar, .gsj-menu-btn, .gsj-overlay { display: none !important; }
+  .gsj-main, .gsj-main.gsj-tool { padding: 0 !important; }
+}
+
+/* ---------------- faixa de topo das páginas (degradê da marca) ---------------- */
+.gsj-hero {
+  position: relative; overflow: hidden; color: #fff; border-radius: 20px;
+  padding: 26px 28px; margin: 0 0 26px;
+  background:
+    radial-gradient(520px 260px at 100% 100%, rgba(232, 171, 104, 0.55), transparent 65%),
+    radial-gradient(420px 240px at 0% 0%, rgba(0, 0, 0, 0.3), transparent 70%),
+    linear-gradient(135deg, #2b2118 0%, #5c3010 42%, #954f14 78%, #c9832e 100%);
+  box-shadow: 0 14px 34px rgba(149, 79, 20, 0.22);
+}
+.gsj-hero .eyebrow {
+  display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+  color: #f3d3a8; margin-bottom: 6px;
+}
+.gsj-hero h1 { color: #fff; margin: 0 0 6px; }
+.gsj-hero .tagline, .gsj-hero p { color: rgba(255, 255, 255, 0.84); margin: 0; }
+.gsj-hero .tagline { max-width: 60ch; }
+.gsj-hero .hero-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.gsj-hero .btn {
+  background: rgba(255, 255, 255, 0.14); color: #fff; border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(2px);
+}
+.gsj-hero .btn:hover { background: rgba(255, 255, 255, 0.24); }
+.gsj-hero .btn-primary { background: #fff; color: #7a3f0d; border-color: #fff; }
+.gsj-hero .btn-primary:hover { background: #fdf3e4; }
+.gsj-hero .badge { background: rgba(255, 255, 255, 0.18); color: #fff; }
+.gsj-hero .badge-ok { background: rgba(168, 224, 176, 0.28); color: #d4f5da; }
+.gsj-hero .badge-warn { background: rgba(255, 190, 170, 0.28); color: #ffe0d6; }
+.gsj-hero .bar { background: rgba(255, 255, 255, 0.24); }
+.gsj-hero .bar > span { background: #fff; }
+.gsj-hero .bar.ok > span { background: #a8e0b0; }
+
+/* ---------------- tela de login / cadastro / aprovação pendente ---------------- */
 .gsj-auth-gate {
-  position: fixed; inset: 0; z-index: 100; background: var(--bg);
-  display: flex; align-items: center; justify-content: center; padding: 24px;
+  position: fixed; inset: 0; z-index: 100; overflow-y: auto;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 24px;
+  background:
+    radial-gradient(900px 520px at 90% 105%, rgba(232, 171, 104, 0.6), transparent 62%),
+    radial-gradient(700px 480px at 0% 0%, rgba(0, 0, 0, 0.38), transparent 65%),
+    linear-gradient(135deg, #2b2118 0%, #5c3010 40%, #954f14 74%, #c9832e 100%);
+}
+.gsj-auth-brand { display: flex; align-items: center; gap: 12px; color: #fff; }
+.gsj-auth-brand .badge {
+  width: 46px; height: 46px; border-radius: 50%; background: #2b2118; color: #e8ab68;
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;
+  font-family: "Newsreader", ui-serif, Georgia, serif; box-shadow: 0 0 0 2px rgba(232, 171, 104, 0.65);
+}
+.gsj-auth-brand .name { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 21px; line-height: 1.1; }
+.gsj-auth-brand .name small {
+  display: block; font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500; font-size: 12px; letter-spacing: 0.04em; opacity: 0.8;
 }
 .gsj-auth-box {
-  width: 100%; max-width: 380px; background: var(--surface); border: 1px solid var(--line);
-  border-radius: 18px; padding: 28px 26px; box-shadow: var(--shadow);
+  width: 100%; max-width: 380px; background: var(--surface); border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 16px; padding: 26px 26px 24px; box-shadow: 0 24px 60px rgba(20, 12, 4, 0.45);
 }
-.gsj-auth-box .gsj-auth-badge {
-  width: 44px; height: 44px; border-radius: 50%; background: var(--text); color: var(--accent-2);
-  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;
-  font-family: "Newsreader", ui-serif, Georgia, serif; margin-bottom: 16px;
-}
-.gsj-auth-box h2 { font-family: "Newsreader", ui-serif, Georgia, serif; font-size: 21px; margin: 0 0 6px; }
+.gsj-auth-box .gsj-auth-badge { display: none; }
+.gsj-auth-box h2 { font-family: "Newsreader", ui-serif, Georgia, serif; font-size: 22px; margin: 0 0 4px; color: var(--text); }
 .gsj-auth-box p.gsj-auth-sub { color: var(--text-muted); font-size: 13.5px; margin: 0 0 18px; line-height: 1.5; }
 .gsj-auth-field { margin-bottom: 12px; }
-.gsj-auth-field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+.gsj-auth-field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
 .gsj-auth-field input {
-  width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line);
+  width: 100%; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--line);
   background: var(--surface-2); color: var(--text); font: inherit; font-size: 14.5px;
+  box-shadow: 0 1px 2px rgba(43, 33, 24, 0.05);
 }
-.gsj-auth-field input:focus { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+.gsj-auth-field input:focus { outline: 2px solid var(--accent-2); outline-offset: 1px; border-color: transparent; }
 .gsj-pw-wrap { position: relative; }
-.gsj-pw-wrap input { padding-right: 40px; }
+.gsj-pw-wrap input { padding-right: 42px; }
 .gsj-pw-toggle {
-  position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+  position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
   width: 32px; height: 32px; border: none; background: none; cursor: pointer;
   font-size: 15px; display: flex; align-items: center; justify-content: center;
   border-radius: 8px; color: var(--text-muted);
@@ -98,7 +168,12 @@
   padding: 9px 12px; font-size: 13px; margin: 0 0 12px;
 }
 .gsj-auth-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
-.gsj-auth-switch { text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 14px; }
+.gsj-auth-actions .btn { width: 100%; justify-content: center; padding: 11px 14px; font-size: 14.5px; border-radius: 10px; }
+.gsj-auth-actions .btn-primary {
+  background: linear-gradient(135deg, #954f14, #b4651c); border-color: transparent; color: #fff;
+  box-shadow: 0 8px 18px rgba(149, 79, 20, 0.35);
+}
+.gsj-auth-switch { text-align: center; font-size: 13px; color: var(--text-muted); margin: 16px 0 0; }
 .gsj-auth-switch button {
   background: none; border: none; color: var(--accent); font: inherit; font-weight: 600;
   cursor: pointer; padding: 0; text-decoration: underline;

@@ -1,0 +1,500 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Acompanhe seu projeto · GSJ Marcenaria</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#954f14">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Source+Sans+3:wght@400;500;600;700&display=swap">
+<style>
+  html { color-scheme: light dark; }
+  body { margin: 0; }
+
+  :root {
+    --bg: #faf6ef; --surface: #ffffff; --surface-2: #fffdf9;
+    --text: #2b2118; --text-muted: #6b5d4f;
+    --accent: #954f14; --accent-2: #c9832e; --accent-soft: #f4e9da;
+    --line: #e3d9c8; --danger: #a6402f; --danger-soft: #f4e1dc;
+    --ok: #3f7d4a; --ok-soft: #e3f0e4;
+    --shadow: 0 1px 2px rgba(43, 33, 24, 0.05), 0 12px 32px rgba(43, 33, 24, 0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
+      --text: #efe7da; --text-muted: #b3a591;
+      --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
+      --line: #3c3226; --danger: #d97d68; --danger-soft: #3a241f;
+      --ok: #7dbb86; --ok-soft: #223027;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif; }
+
+  .top { background: linear-gradient(135deg, #2b2118 0%, #5c3010 55%, #954f14 100%); color: #fff; padding: 14px 20px; padding-top: calc(14px + env(safe-area-inset-top, 0px)); }
+  .top-in { max-width: 760px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .top .badge-logo {
+    width: 38px; height: 38px; border-radius: 50%; background: #2b2118; color: #e8ab68; box-shadow: 0 0 0 1.5px rgba(232,171,104,0.6); flex: none;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;
+    font-family: "Newsreader", ui-serif, Georgia, serif;
+  }
+  .top .brand { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 16px; line-height: 1.2; }
+  .top .brand small { display: block; font-family: "Source Sans 3", ui-sans-serif, sans-serif; font-weight: 400; font-size: 12px; opacity: 0.75; }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 26px 20px 80px; }
+  h1 { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: clamp(26px, 6vw, 34px); margin: 0 0 4px; line-height: 1.15; }
+  h2 { font-family: "Newsreader", ui-serif, Georgia, serif; font-size: 19px; margin: 0 0 12px; }
+  .hello { color: var(--text-muted); font-size: 15px; margin: 0 0 4px; }
+  .addr { color: var(--text-muted); font-size: 14px; margin: 0 0 18px; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 20px; }
+  .badge { display: inline-block; padding: 3px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--accent-soft); color: var(--accent); }
+  .badge-ok { background: var(--ok-soft); color: var(--ok); }
+  .badge-warn { background: var(--danger-soft); color: var(--danger); }
+
+  .progress-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .pct { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 54px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .bar { height: 14px; border-radius: 999px; background: var(--accent-soft); overflow: hidden; }
+  .bar > span { display: block; height: 100%; background: var(--accent-2); border-radius: 999px; transition: width 0.6s; }
+  .bar.ok > span { background: var(--ok); }
+  .dates { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 16px; }
+  .dates .lbl { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+  .dates .val { font-weight: 700; font-size: 16px; }
+
+  .welcome { background: var(--accent-soft); border: 1px solid var(--line); border-radius: 16px; padding: 14px 18px; margin-bottom: 20px; font-size: 15px; line-height: 1.55; white-space: pre-wrap; }
+
+  /* linha do tempo das etapas */
+  .steps { list-style: none; margin: 0; padding: 0; }
+  .step { display: flex; gap: 14px; position: relative; padding-bottom: 16px; }
+  .step:last-child { padding-bottom: 0; }
+  .step:not(:last-child)::before { content: ""; position: absolute; left: 13px; top: 28px; bottom: 0; width: 2px; background: var(--line); }
+  .step.done:not(:last-child)::before { background: var(--ok); }
+  .dot {
+    width: 28px; height: 28px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; border: 2px solid var(--line); background: var(--surface); color: var(--text-muted);
+  }
+  .step.done .dot { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .step.doing .dot { border-color: var(--accent-2); color: var(--accent); background: var(--accent-soft); }
+  .step .nm { font-weight: 600; font-size: 15.5px; padding-top: 3px; }
+  .step.todo .nm { color: var(--text-muted); font-weight: 500; }
+  .step .sm { font-size: 12.5px; color: var(--text-muted); }
+
+  /* fotos */
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .chip { border: 1px solid var(--line); background: var(--surface); color: var(--text); font: inherit; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 999px; cursor: pointer; }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .gallery figure { margin: 0; cursor: zoom-in; }
+  .gallery img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 12px; display: block; background: var(--accent-soft); }
+  .gallery figcaption { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
+
+  .post { padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .post:last-child { border-bottom: none; padding-bottom: 0; }
+  .post:first-child { padding-top: 0; }
+  .post .when { font-size: 12.5px; color: var(--text-muted); margin-bottom: 3px; }
+  .post .txt { white-space: pre-wrap; font-size: 15px; line-height: 1.55; }
+  .reply-box { margin-top: 8px; padding: 9px 12px; background: var(--accent-soft); border-radius: 10px; font-size: 14px; white-space: pre-wrap; }
+
+  .field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+  .field input, .field textarea {
+    width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--surface-2); color: var(--text); font: inherit; font-size: 15px; margin-bottom: 10px;
+  }
+  .field textarea { min-height: 84px; resize: vertical; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--text); font: inherit; font-weight: 600; font-size: 14.5px; padding: 10px 16px; cursor: pointer;
+  }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-ok { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+  .btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .msg-ok { background: var(--ok-soft); color: var(--ok); border-radius: 10px; padding: 9px 12px; font-size: 14px; margin: 10px 0 0; }
+  .msg-err { background: var(--danger-soft); color: var(--danger); border-radius: 10px; padding: 9px 12px; font-size: 14px; margin: 10px 0 0; }
+
+  .empty { color: var(--text-muted); font-size: 14px; margin: 0; }
+  .center { text-align: center; padding: 70px 20px; color: var(--text-muted); }
+  .center h1 { color: var(--text); }
+  .foot { text-align: center; color: var(--text-muted); font-size: 12.5px; margin-top: 30px; }
+  .lightbox { position: fixed; inset: 0; z-index: 150; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; flex-direction: column; gap: 10px; }
+  .lightbox img { max-width: 100%; max-height: 85vh; border-radius: 8px; }
+  .lightbox p { color: #fff; margin: 0; font-size: 14px; text-align: center; }
+  [hidden] { display: none !important; }
+  @media (max-width: 480px) { .wrap { padding: 20px 16px 70px; } .card { padding: 16px; } .pct { font-size: 46px; } }
+
+  .login-box { width: 100%; max-width: 380px; margin: 0 auto; box-shadow: 0 24px 60px rgba(20, 12, 4, 0.45); border-color: rgba(255,255,255,0.35); }
+  .login-box h1 { font-size: 24px; }
+  body.is-login {
+    min-height: 100vh;
+    background:
+      radial-gradient(900px 520px at 90% 105%, rgba(232, 171, 104, 0.6), transparent 62%),
+      radial-gradient(700px 480px at 0% 0%, rgba(0, 0, 0, 0.38), transparent 65%),
+      linear-gradient(135deg, #2b2118 0%, #5c3010 40%, #954f14 74%, #c9832e 100%);
+    background-attachment: fixed;
+  }
+  body.is-login .top { display: none; }
+  body.is-login .wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding-top: 24px; padding-bottom: 24px; }
+  body.is-login .foot { color: rgba(255,255,255,0.8); margin: 0; }
+  .lockup { display: flex; align-items: center; gap: 12px; color: #fff; }
+  .badge-logo { border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: "Newsreader", ui-serif, Georgia, serif; flex: none; }
+  .lockup .badge-logo { width: 46px; height: 46px; font-size: 15px; background: #2b2118; color: #e8ab68; box-shadow: 0 0 0 2px rgba(232,171,104,0.65); }
+  .lockup .nm { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 21px; line-height: 1.1; }
+  .lockup .nm small { display: block; font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.04em; opacity: 0.8; }
+  .hero-card {
+    position: relative; overflow: hidden; color: #fff; border: none;
+    background:
+      radial-gradient(520px 260px at 100% 100%, rgba(232, 171, 104, 0.55), transparent 65%),
+      radial-gradient(420px 240px at 0% 0%, rgba(0, 0, 0, 0.3), transparent 70%),
+      linear-gradient(135deg, #2b2118 0%, #5c3010 42%, #954f14 78%, #c9832e 100%);
+    box-shadow: 0 14px 34px rgba(149, 79, 20, 0.25);
+  }
+  .hero-card .hello { color: rgba(255,255,255,0.85); }
+  .hero-card .bar { background: rgba(255,255,255,0.24); }
+  .hero-card .bar > span { background: #fff; }
+  .hero-card .bar.ok > span { background: #a8e0b0; }
+  .hero-card .dates .lbl { color: #f3d3a8; }
+  .hero-card .dates .val { color: #fff; }
+  .hero-card .dates .val .hello { color: rgba(255,255,255,0.85); }
+  .pw-wrap { position: relative; }
+  .pw-wrap input { padding-right: 44px; }
+  .pw-toggle { position: absolute; right: 6px; top: 7px; width: 34px; height: 34px; border: none; background: none; cursor: pointer; font-size: 16px; border-radius: 8px; color: var(--text-muted); }
+  .pw-toggle:hover { background: var(--accent-soft); }
+  .top-in .spacer { flex: 1; }
+  .top .who { font-size: 13px; opacity: 0.85; text-align: right; }
+  .top .linkbtn { background: none; border: none; color: inherit; font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; padding: 0; opacity: 0.85; }
+  .obra-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  details.senha { margin-top: 26px; font-size: 14px; }
+  details.senha summary { cursor: pointer; color: var(--text-muted); }
+  details.senha .field { max-width: 320px; margin-top: 10px; }
+</style>
+</head>
+<body>
+  <header class="top"><div class="top-in">
+    <div class="badge-logo">GSJ</div>
+    <div class="brand">GSJ Marcenaria<small>Móveis planejados · Área do cliente</small></div>
+    <div class="spacer"></div>
+    <div class="who" id="who" hidden><span id="whoName"></span><br><button type="button" class="linkbtn" id="logoutBtn">Sair</button></div>
+  </div></header>
+
+  <div class="wrap" id="root">
+    <div class="center"><p>Carregando…</p></div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  (function () {
+    "use strict";
+    var SUPABASE_URL = "https://brulthsmuhwftodbnhpg.supabase.co";
+    var SUPABASE_KEY = "sb_publishable_esuL-cCe9-_5BJfB1kgWMQ_kjHugWUs";
+    var BUCKET = "gsj-obras";
+    var EMAIL_DOMAIN = "@cliente.gsj.local";
+    var STATUS_LABEL = { aprovado: "Projeto aprovado", em_andamento: "Em andamento", pausado: "Pausado", concluido: "Concluído" };
+    var STATUS_CLASS = { aprovado: "badge", em_andamento: "badge", pausado: "badge badge-warn", concluido: "badge badge-ok" };
+
+    var root = document.getElementById("root");
+    var sb = null;
+    try {
+      // storageKey próprio: a sessão do cliente nunca se mistura com a da equipe no mesmo navegador
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { storageKey: "gsj-cliente-auth", persistSession: true, autoRefreshToken: true } });
+    } catch (e) {}
+
+    function esc(s) {
+      return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function fmtDate(d) {
+      if (!d) return "—";
+      var p = String(d).slice(0, 10).split("-");
+      return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : d;
+    }
+    function fmtDt(iso) {
+      try { return new Date(iso).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); } catch (e) { return iso || ""; }
+    }
+    function calcPct(etapas) {
+      if (!etapas || !etapas.length) return 0;
+      var pts = 0;
+      etapas.forEach(function (e) { pts += e.status === "concluida" ? 1 : (e.status === "andamento" ? 0.5 : 0); });
+      return Math.round((pts / etapas.length) * 100);
+    }
+    function setLoginMode(on) { document.body.classList.toggle("is-login", !!on); }
+    function showMessage(title, text, withLogout) {
+      setLoginMode(false);
+      root.innerHTML = '<div class="center"><h1>' + esc(title) + "</h1><p>" + esc(text) + "</p>" +
+        (withLogout ? '<p><button type="button" class="btn" id="msgLogout">Sair</button></p>' : "") + "</div>";
+      var b = document.getElementById("msgLogout");
+      if (b) b.addEventListener("click", logout);
+    }
+
+    var obras = [];
+    var currentId = null;
+    var etapaFilter = "";
+    var urlMap = {};
+    var userNome = "";
+
+    // ---------------------------------------------------------------- login
+    function renderLogin(errMsg) {
+      document.getElementById("who").hidden = true;
+      setLoginMode(true);
+      root.innerHTML =
+        '<div class="lockup"><div class="badge-logo">GSJ</div><div class="nm">GSJ Marcenaria<small>Móveis planejados</small></div></div>' +
+        '<div class="card login-box">' +
+          '<h1>Acompanhe seu projeto</h1>' +
+          '<p class="hello">Entre com o usuário e a senha que a GSJ Marcenaria te enviou.</p>' +
+          '<form id="loginForm" class="field" style="margin-top:16px;">' +
+            '<label for="lUser">Usuário</label><input id="lUser" autocomplete="username" autocapitalize="off" />' +
+            '<label for="lPass">Senha</label>' +
+            '<div class="pw-wrap"><input id="lPass" type="password" autocomplete="current-password" />' +
+            '<button type="button" class="pw-toggle" id="pwToggle" aria-label="Mostrar senha">👁</button></div>' +
+            '<button type="submit" class="btn btn-primary" id="lBtn" style="width:100%;">Entrar</button>' +
+            '<div id="lErr">' + (errMsg ? '<p class="msg-err">' + esc(errMsg) + "</p>" : "") + "</div>" +
+          "</form>" +
+        "</div>" +
+        '<p class="foot">Não recebeu o acesso? Fale com a GSJ Marcenaria.</p>';
+      document.getElementById("pwToggle").addEventListener("click", function () {
+        var i = document.getElementById("lPass");
+        var showing = i.type === "text";
+        i.type = showing ? "password" : "text";
+        this.textContent = showing ? "👁" : "🙈";
+        this.setAttribute("aria-label", showing ? "Mostrar senha" : "Esconder senha");
+      });
+      document.getElementById("loginForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var user = document.getElementById("lUser").value.trim().toLowerCase().replace(/[^a-z0-9._-]/g, "");
+        var pass = document.getElementById("lPass").value;
+        var err = document.getElementById("lErr");
+        if (!user || !pass) { err.innerHTML = '<p class="msg-err">Preencha usuário e senha.</p>'; return; }
+        var btn = document.getElementById("lBtn");
+        btn.disabled = true; btn.textContent = "Entrando…";
+        sb.auth.signInWithPassword({ email: user + EMAIL_DOMAIN, password: pass }).then(function (res) {
+          if (res.error) {
+            btn.disabled = false; btn.textContent = "Entrar";
+            err.innerHTML = '<p class="msg-err">Usuário ou senha incorretos.</p>';
+            return;
+          }
+          loadPortal();
+        }).catch(function () {
+          btn.disabled = false; btn.textContent = "Entrar";
+          err.innerHTML = '<p class="msg-err">Não deu pra entrar agora — verifique sua internet.</p>';
+        });
+      });
+    }
+
+    function logout() {
+      sb.auth.signOut().finally(function () { obras = []; currentId = null; renderLogin(); });
+    }
+    document.getElementById("logoutBtn").addEventListener("click", logout);
+
+    // ------------------------------------------------------------- portal
+    function signPhotos(list) {
+      var paths = [];
+      list.forEach(function (o) { (o.fotos || []).forEach(function (f) { if (!urlMap[f.path]) paths.push(f.path); }); });
+      if (!paths.length) return Promise.resolve();
+      return sb.storage.from(BUCKET).createSignedUrls(paths, 3600).then(function (res) {
+        (res.data || []).forEach(function (r) { if (r && r.signedUrl && !r.error) urlMap[r.path] = r.signedUrl; });
+      }, function () {});
+    }
+    function photoUrl(path) {
+      return urlMap[path] || sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+    }
+
+    function loadPortal(silent) {
+      if (!sb) { showMessage("Não deu pra carregar", "Recarregue a página."); return; }
+      sb.auth.getSession().then(function (r) {
+        if (!r.data || !r.data.session) { renderLogin(); return; }
+        return sb.rpc("gsj_cliente_obras").then(function (res) {
+          if (res.error) { if (!silent) showMessage("Não deu pra carregar", "Verifique sua internet e tente de novo em instantes.", true); return; }
+          var list = res.data || [];
+          if (!list.length) { showMessage("Acesso indisponível", "Esse login não tem nenhuma obra liberada no momento. Fale com a GSJ Marcenaria.", true); return; }
+          return signPhotos(list).then(function () {
+            obras = list;
+            if (!currentId || !obras.some(function (o) { return o.id === currentId; })) currentId = obras[0].id;
+            userNome = obras[0].cliente_nome || "";
+            document.getElementById("whoName").textContent = userNome;
+            document.getElementById("who").hidden = false;
+            render();
+          });
+        });
+      }).catch(function () { if (!silent) showMessage("Não deu pra carregar", "Verifique sua internet e tente de novo em instantes.", true); });
+    }
+
+    function render() {
+      var d = obras.filter(function (o) { return o.id === currentId; })[0];
+      if (!d) return;
+      var etapas = d.etapas || [];
+      var pct = calcPct(etapas);
+      document.title = d.titulo + " · GSJ Marcenaria";
+      var first = String(d.cliente_nome || "").split(" ")[0];
+
+      var diasTxt = "";
+      if (d.prazo_entrega && d.status !== "concluido") {
+        var dias = Math.ceil((new Date(d.prazo_entrega + "T12:00:00") - new Date()) / 86400000);
+        diasTxt = dias > 0 ? "faltam " + dias + " dia" + (dias === 1 ? "" : "s") : (dias === 0 ? "é hoje!" : "prazo em revisão");
+      }
+
+      setLoginMode(false);
+      var h = "";
+      if (obras.length > 1) {
+        h += '<div class="obra-tabs">';
+        obras.forEach(function (o) { h += '<button type="button" class="chip' + (o.id === currentId ? " on" : "") + '" data-obra="' + o.id + '">' + esc(o.titulo) + "</button>"; });
+        h += "</div>";
+      }
+      h += '<p class="hello">Olá, ' + esc(first) + "!</p>";
+      h += "<h1>" + esc(d.titulo) + "</h1>";
+      h += '<p class="addr">' + (d.endereco ? esc(d.endereco) + " · " : "") + '<span class="' + STATUS_CLASS[d.status] + '">' + STATUS_LABEL[d.status] + "</span></p>";
+      if (d.mensagem_cliente) h += '<div class="welcome">' + esc(d.mensagem_cliente) + "</div>";
+
+      h += '<div class="card hero-card"><div class="progress-top"><div class="pct">' + pct + '%</div><div class="hello">do projeto concluído</div></div>' +
+        '<div class="bar' + (pct === 100 ? " ok" : "") + '"><span style="width:' + pct + '%"></span></div>' +
+        '<div class="dates">' +
+          '<div><div class="lbl">Início</div><div class="val">' + fmtDate(d.data_inicio) + "</div></div>" +
+          '<div><div class="lbl">Previsão de entrega</div><div class="val">' + fmtDate(d.prazo_entrega) + (diasTxt ? ' <span class="hello">(' + diasTxt + ")</span>" : "") + "</div></div>" +
+          '<div><div class="lbl">Atualizado em</div><div class="val">' + fmtDate(d.atualizado_em) + "</div></div>" +
+        "</div></div>";
+
+      if (etapas.length) {
+        h += '<div class="card"><h2>Etapas do projeto</h2><ol class="steps">';
+        etapas.forEach(function (e, i) {
+          var cls = e.status === "concluida" ? "done" : (e.status === "andamento" ? "doing" : "todo");
+          var sm = e.status === "concluida" ? "Concluída" + (e.data ? " em " + fmtDate(e.data) : "") : (e.status === "andamento" ? "Em andamento agora" : "A seguir");
+          h += '<li class="step ' + cls + '"><div class="dot">' + (e.status === "concluida" ? "✓" : (i + 1)) + '</div><div><div class="nm">' + esc(e.nome) + '</div><div class="sm">' + sm + "</div></div></li>";
+        });
+        h += "</ol></div>";
+      }
+
+      var fotos = d.fotos || [];
+      h += '<div class="card"><h2>Fotos do andamento</h2>';
+      if (!fotos.length) h += '<p class="empty">As fotos aparecem aqui conforme a obra avança.</p>';
+      else {
+        var nomes = [];
+        fotos.forEach(function (f) { if (f.etapa && nomes.indexOf(f.etapa) < 0) nomes.push(f.etapa); });
+        if (nomes.length) {
+          h += '<div class="chips"><button type="button" class="chip' + (etapaFilter === "" ? " on" : "") + '" data-etapa="">Todas</button>';
+          nomes.forEach(function (n) { h += '<button type="button" class="chip' + (etapaFilter === n ? " on" : "") + '" data-etapa="' + esc(n) + '">' + esc(n) + "</button>"; });
+          h += "</div>";
+        }
+        h += '<div class="gallery">';
+        fotos.forEach(function (f, i) {
+          if (etapaFilter && f.etapa !== etapaFilter) return;
+          h += '<figure data-i="' + i + '"><img loading="lazy" src="' + esc(photoUrl(f.path)) + '" alt="' + esc(f.legenda || "Foto da obra") + '" />' +
+            "<figcaption>" + esc(f.legenda || fmtDate(f.created_at)) + "</figcaption></figure>";
+        });
+        h += "</div>";
+      }
+      h += "</div>";
+
+      var ups = d.updates || [];
+      h += '<div class="card"><h2>Novidades</h2>';
+      if (!ups.length) h += '<p class="empty">Em breve a equipe publica novidades por aqui.</p>';
+      else ups.forEach(function (u) {
+        h += '<div class="post"><div class="when">' + fmtDt(u.created_at) + '</div><div class="txt">' + esc(u.texto) + "</div></div>";
+      });
+      h += "</div>";
+
+      var msgs = d.mensagens || [];
+      h += '<div class="card"><h2>Fale com a gente</h2>' +
+        '<form id="msgForm" class="field">' +
+          '<label for="mTexto">Sua mensagem</label><textarea id="mTexto" maxlength="1000" placeholder="Dúvida, pedido de ajuste, recado…"></textarea>' +
+          '<div class="btns"><button type="submit" class="btn btn-primary" id="mBtn">Enviar mensagem</button>' +
+          '<button type="button" class="btn btn-ok" id="aprovarBtn">👍 Aprovar o andamento até aqui</button></div>' +
+          '<div id="mFeedback"></div>' +
+        "</form>";
+      if (msgs.length) {
+        h += '<div style="margin-top:18px;">';
+        msgs.forEach(function (m) {
+          h += '<div class="post"><div class="when">' + fmtDt(m.created_at) + " · você" + (m.tipo === "aprovacao" ? " · aprovação" : "") + '</div><div class="txt">' + esc(m.texto) + "</div>" +
+            (m.resposta ? '<div class="reply-box"><strong>GSJ Marcenaria</strong> · ' + fmtDt(m.respondida_em) + "<br>" + esc(m.resposta) + "</div>" : "") + "</div>";
+        });
+        h += "</div>";
+      }
+      h += "</div>";
+
+      h += '<details class="senha"><summary>Trocar minha senha</summary>' +
+        '<form id="passForm" class="field"><label for="pNova">Nova senha (mín. 6 caracteres)</label>' +
+        '<div class="pw-wrap"><input id="pNova" type="password" autocomplete="new-password" /><button type="button" class="pw-toggle" id="pw2Toggle" aria-label="Mostrar senha">👁</button></div>' +
+        '<button type="submit" class="btn" id="pBtn">Salvar nova senha</button><div id="pFeedback"></div></form></details>';
+
+      h += '<p class="foot">GSJ Marcenaria &amp; Móveis Planejados · esta página atualiza sozinha quando você volta pra ela.</p>';
+      root.innerHTML = h;
+      wire(d);
+    }
+
+    function wire(d) {
+      root.querySelectorAll("[data-obra]").forEach(function (c) {
+        c.addEventListener("click", function () { currentId = c.getAttribute("data-obra"); etapaFilter = ""; render(); });
+      });
+      root.querySelectorAll("[data-etapa]").forEach(function (c) {
+        c.addEventListener("click", function () { etapaFilter = c.getAttribute("data-etapa"); render(); });
+      });
+      root.querySelectorAll(".gallery figure").forEach(function (fg) {
+        fg.addEventListener("click", function () {
+          var f = d.fotos[Number(fg.getAttribute("data-i"))];
+          var lb = document.createElement("div");
+          lb.className = "lightbox";
+          lb.innerHTML = '<img src="' + esc(photoUrl(f.path)) + '" alt="" />' + (f.legenda ? "<p>" + esc(f.legenda) + "</p>" : "");
+          lb.addEventListener("click", function () { lb.remove(); });
+          document.body.appendChild(lb);
+        });
+      });
+
+      var fb = document.getElementById("mFeedback");
+      function send(texto, tipo, btn) {
+        fb.innerHTML = "";
+        btn.disabled = true;
+        sb.rpc("gsj_cliente_mensagem", { p_obra_id: d.id, p_texto: texto, p_tipo: tipo }).then(function (res) {
+          btn.disabled = false;
+          if (res.error || res.data !== true) {
+            fb.innerHTML = '<p class="msg-err">Não deu pra enviar agora. Tente de novo em instantes.</p>';
+            return;
+          }
+          loadPortal(true);
+          setTimeout(function () {
+            var f2 = document.getElementById("mFeedback");
+            if (f2) f2.innerHTML = '<p class="msg-ok">Recebemos! Nossa equipe responde por aqui.</p>';
+          }, 500);
+        }).catch(function () {
+          btn.disabled = false;
+          fb.innerHTML = '<p class="msg-err">Não deu pra enviar agora — verifique sua internet.</p>';
+        });
+      }
+      document.getElementById("msgForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var t = document.getElementById("mTexto").value.trim();
+        if (!t) { fb.innerHTML = '<p class="msg-err">Escreva uma mensagem antes de enviar.</p>'; return; }
+        send(t, "mensagem", document.getElementById("mBtn"));
+      });
+      document.getElementById("aprovarBtn").addEventListener("click", function () {
+        send("Aprovo o andamento do projeto até aqui (" + calcPct(d.etapas) + "% concluído).", "aprovacao", this);
+      });
+
+      document.getElementById("pw2Toggle").addEventListener("click", function () {
+        var i = document.getElementById("pNova");
+        var showing = i.type === "text";
+        i.type = showing ? "password" : "text";
+        this.textContent = showing ? "👁" : "🙈";
+      });
+      document.getElementById("passForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var nova = document.getElementById("pNova").value;
+        var pf = document.getElementById("pFeedback");
+        if (nova.length < 6) { pf.innerHTML = '<p class="msg-err">A senha precisa ter pelo menos 6 caracteres.</p>'; return; }
+        var btn = document.getElementById("pBtn"); btn.disabled = true;
+        sb.auth.updateUser({ password: nova }).then(function (res) {
+          btn.disabled = false;
+          if (res.error) { pf.innerHTML = '<p class="msg-err">Não deu pra trocar a senha agora.</p>'; return; }
+          document.getElementById("pNova").value = "";
+          pf.innerHTML = '<p class="msg-ok">Senha trocada! Use a nova na próxima vez que entrar.</p>';
+        });
+      });
+    }
+
+    // recarrega quando o cliente volta pra aba (só se não estiver escrevendo)
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState !== "visible" || !obras.length) return;
+      var t = document.getElementById("mTexto");
+      var p = document.getElementById("pNova");
+      if ((t && t.value.trim()) || (p && p.value)) return;
+      loadPortal(true);
+    });
+
+    loadPortal(false);
+  })();
+</script>
+</body></html>

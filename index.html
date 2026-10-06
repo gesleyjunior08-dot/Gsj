@@ -69,11 +69,19 @@
   .install-bar p { margin: 0; font-size: 14px; color: var(--text-muted); }
   .install-bar strong { color: var(--text); }
 
-  .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 30px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-bottom: 30px; }
   .stat-tile {
-    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
     padding: 16px 18px; box-shadow: var(--shadow);
   }
+  .stat-tile .ico {
+    width: 42px; height: 42px; flex: none; border-radius: 12px; font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--accent-soft), #f0d9b6);
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stat-tile .ico { background: linear-gradient(135deg, #3a2c1e, #4a3622); } }
+  :root[data-theme="dark"] .stat-tile .ico { background: linear-gradient(135deg, #3a2c1e, #4a3622); }
   .stat-tile .num { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 28px; line-height: 1.1; }
   .stat-tile .lbl { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 
@@ -84,14 +92,18 @@
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px;
     font-weight: 600; font-size: 14px;
   }
-  .quick-card:hover { border-color: var(--accent-2); }
+  .quick-card { border-radius: 14px; transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s; }
+  .quick-card:hover { border-color: var(--accent-2); transform: translateY(-2px); box-shadow: var(--shadow); }
 </style>
 </head>
 <body>
   <div class="app" id="gsjPageRoot">
     <div class="wrap">
-      <h1>Início</h1>
-      <p class="tagline">Resumo geral do que está salvo na nuvem da GSJ Marcenaria &amp; Móveis Planejados.</p>
+      <div class="gsj-hero">
+        <span class="eyebrow" id="heroDate">Início</span>
+        <h1 id="heroTitle">Início</h1>
+        <p class="tagline">Resumo geral do que está salvo na nuvem da GSJ Marcenaria &amp; Móveis Planejados.</p>
+      </div>
 
       <div class="install-bar" id="installBar" hidden>
         <p><strong>Instale como app</strong> — abre direto pelo ícone, em tela cheia, sem precisar do navegador.</p>
@@ -102,11 +114,12 @@
       </div>
 
       <div class="stat-grid" id="statGrid">
-        <div class="stat-tile"><div class="num">—</div><div class="lbl">Orçamentos</div></div>
-        <div class="stat-tile"><div class="num">—</div><div class="lbl">Contratos</div></div>
-        <div class="stat-tile"><div class="num">—</div><div class="lbl">Recibos</div></div>
-        <div class="stat-tile"><div class="num">—</div><div class="lbl">Termos de entrega</div></div>
-        <div class="stat-tile"><div class="num">—</div><div class="lbl">Planos de corte</div></div>
+        <div class="stat-tile"><span class="ico">📋</span><div><div class="num">—</div><div class="lbl">Orçamentos</div></div></div>
+        <div class="stat-tile"><span class="ico">📄</span><div><div class="num">—</div><div class="lbl">Contratos</div></div></div>
+        <div class="stat-tile"><span class="ico">🧾</span><div><div class="num">—</div><div class="lbl">Recibos</div></div></div>
+        <div class="stat-tile"><span class="ico">📦</span><div><div class="num">—</div><div class="lbl">Termos de entrega</div></div></div>
+        <div class="stat-tile"><span class="ico">📐</span><div><div class="num">—</div><div class="lbl">Planos de corte</div></div></div>
+        <div class="stat-tile"><span class="ico">👥</span><div><div class="num">—</div><div class="lbl">Obras em andamento</div></div></div>
       </div>
 
       <div class="quick-section">
@@ -117,6 +130,7 @@
           <a class="quick-card" href="./recibo.html">🧾 Recibo</a>
           <a class="quick-card" href="./termo-entrega.html">📦 Termo de Entrega</a>
           <a class="quick-card" href="./plano-de-cortes.html">📐 Plano de Cortes</a>
+          <a class="quick-card" href="./obras.html">👥 Área do cliente</a>
         </div>
       </div>
     </div>
@@ -128,6 +142,14 @@
 <script>
   GSJ.boot({ page: "inicio" }).then(function () {
     if (!GSJ.sb) return;
+    if (GSJ.user) {
+      var primeiro = String(GSJ.user.nome || GSJ.user.username || "").split(" ")[0];
+      document.getElementById("heroTitle").textContent = "Olá, " + primeiro;
+      try {
+        var d = new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
+        document.getElementById("heroDate").textContent = d;
+      } catch (e) {}
+    }
     var tiles = document.querySelectorAll("#statGrid .num");
     var tables = ["gsj_orcamentos", "gsj_contratos", "gsj_recibos", "gsj_termos_entrega", "gsj_planos_corte"];
     tables.forEach(function (table, i) {
@@ -136,6 +158,12 @@
       }, function () {
         tiles[i].textContent = "—";
       });
+    });
+    // 6º tile: obras ativas na Área do cliente (não concluídas)
+    GSJ.sb.from("gsj_obras").select("id", { count: "exact", head: true }).neq("status", "concluido").then(function (res) {
+      tiles[5].textContent = (res.count == null ? "—" : res.count);
+    }, function () {
+      tiles[5].textContent = "—";
     });
   });
 
