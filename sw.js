@@ -7,7 +7,7 @@
 // Pra publicar uma atualização: troque o número da versão abaixo
 // (CACHE_VERSION) sempre que mudar algum arquivo. Sem isso, quem já
 // instalou o app pode continuar vendo a versão antiga por um tempo.
-const CACHE_VERSION = "v6";
+const CACHE_VERSION = "v7";
 const CACHE_NAME = "gsj-app-" + CACHE_VERSION;
 
 const PRECACHE_URLS = [
@@ -51,8 +51,28 @@ self.addEventListener("activate", function (event) {
 self.addEventListener("fetch", function (event) {
   const req = event.request;
 
-  // só cuida de GET e só do mesmo site (nunca intercepta Supabase/CDN)
-  if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) {
+  const url = new URL(req.url);
+
+  // biblioteca do Supabase (CDN): guarda em cache pra a página não esperar a internet
+  // a cada troca de tela. Só ela — o resto dos CDNs e a nuvem seguem direto.
+  if (req.method === "GET" && url.hostname === "cdn.jsdelivr.net" && url.pathname.indexOf("/npm/@supabase/supabase-js") === 0) {
+    event.respondWith(
+      caches.match(req).then(function (cached) {
+        const network = fetch(req).then(function (response) {
+          if (response && (response.ok || response.type === "opaque")) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then(function (cache) { cache.put(req, copy); });
+          }
+          return response;
+        }).catch(function () { return cached; });
+        return cached || network;
+      })
+    );
+    return;
+  }
+
+  // o resto: só GET e só do mesmo site (nunca intercepta Supabase/nuvem)
+  if (req.method !== "GET" || url.origin !== self.location.origin) {
     return;
   }
 

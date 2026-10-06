@@ -367,7 +367,7 @@
       <h2 style="margin:0">Planos salvos na nuvem</h2>
       <button class="btn btn-ghost" id="btnCloudClose" type="button">Fechar</button>
     </div>
-    <div id="cloudList" class="cloud-list"><p class="field-hint">Carregando…</p></div>
+    <div id="cloudList" class="cloud-list"><span class="gsj-skel"></span><span class="gsj-skel"></span></div>
   </div>
 </div>
 
@@ -804,7 +804,7 @@
 
   async function cloudOpenModal() {
     cloudModal.hidden = false;
-    cloudListEl.innerHTML = '<p class="field-hint">Carregando…</p>';
+    cloudListEl.innerHTML = '<span class="gsj-skel"></span><span class="gsj-skel"></span>';
     if (!sb) { cloudListEl.innerHTML = '<p class="field-hint">A biblioteca da nuvem não carregou — recarregue a página.</p>'; return; }
     try {
       var result = await sb.from("gsj_planos_corte")

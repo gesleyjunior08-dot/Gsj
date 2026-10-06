@@ -33,15 +33,28 @@
   // pra a página abrir NA HORA, sem tela de "carregando" — a conferência real roda depois, por baixo.
   var SB_STORAGE_KEY = "sb-brulthsmuhwftodbnhpg-auth-token";
   var PROFILE_CACHE_KEY = "gsj_profile_cache_v1";
+  function hasStoredSession() {
+    // não depende do formato exato da sessão: basta existir alguma chave "sb-...-auth-token"
+    try {
+      if (localStorage.getItem(SB_STORAGE_KEY)) return true;
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i) || "";
+        if (/^sb-.+-auth-token$/.test(k) && localStorage.getItem(k)) return true;
+      }
+    } catch (e) {}
+    return false;
+  }
   function readCachedProfile() {
     try {
-      var raw = localStorage.getItem(SB_STORAGE_KEY);
-      if (!raw) return null;
-      var sess = JSON.parse(raw);
-      var uid = sess && sess.user && sess.user.id;
-      if (!uid) return null;
       var p = JSON.parse(localStorage.getItem(PROFILE_CACHE_KEY) || "null");
-      if (!p || p.id !== uid || !p.approved) return null;
+      if (!p || !p.id || !p.approved) return null;
+      if (!hasStoredSession()) return null;
+      // se der pra ler o id da sessão, ele tem que bater com o do perfil guardado
+      try {
+        var sess = JSON.parse(localStorage.getItem(SB_STORAGE_KEY) || "null");
+        var uid = sess && sess.user && sess.user.id;
+        if (uid && uid !== p.id) return null;
+      } catch (e2) {}
       return p;
     } catch (e) { return null; }
   }

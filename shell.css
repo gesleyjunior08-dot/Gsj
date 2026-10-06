@@ -194,3 +194,11 @@ html.gsj-pending body { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
+
+/* esqueleto no lugar de "Carregando…" (a lista aparece sem pular) */
+.gsj-skel{display:block;height:44px;border-radius:12px;margin:8px 0;
+  background:linear-gradient(90deg,rgba(120,120,140,.10) 25%,rgba(120,120,140,.20) 37%,rgba(120,120,140,.10) 63%);
+  background-size:400% 100%;animation:gsj-skel 1.4s ease infinite}
+.gsj-skel + .gsj-skel{opacity:.7}
+@keyframes gsj-skel{0%{background-position:100% 50%}100%{background-position:0 50%}}
+@media (prefers-reduced-motion:reduce){.gsj-skel{animation:none}}

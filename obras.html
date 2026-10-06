@@ -167,7 +167,7 @@
             <button type="button" class="btn btn-primary" id="newObraBtn">+ Nova obra</button>
           </div>
         </div>
-        <div id="obraList"><p class="empty">Carregando…</p></div>
+        <div id="obraList"><span class="gsj-skel"></span><span class="gsj-skel"></span></div>
       </section>
 
       <!-- DETALHE -->
@@ -355,7 +355,7 @@
   // ------------------------------------------------------------------ LISTA
   function loadList() {
     var box = $("obraList");
-    box.innerHTML = '<p class="empty">Carregando…</p>';
+    box.innerHTML = '<span class="gsj-skel"></span><span class="gsj-skel"></span>';
     Promise.all([
       sb.from("gsj_obras").select("*").order("created_at", { ascending: false }),
       sb.from("gsj_obra_mensagens").select("obra_id").eq("lida", false),

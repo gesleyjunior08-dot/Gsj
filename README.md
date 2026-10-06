@@ -6,6 +6,8 @@ App instalável (PWA) da GSJ Marcenaria & Móveis Planejados, reunindo as 5 ferr
 
 - `index.html` — **Início**: resumo (quantos orçamentos/contratos/recibos/termos/planos existem na nuvem) e atalhos pras ferramentas.
 - `orcamento.html`, `contrato.html`, `recibo.html`, `termo-entrega.html`, `plano-de-cortes.html` — as 5 ferramentas.
+- `obras.html` — **Área do cliente** (gestão da equipe): cada obra tem etapas com progresso automático, fotos, novidades, recados do cliente e o **login do cliente** (usuário + senha só dele, criado ali mesmo).
+- `cliente.html` — a página do cliente: ele entra com o login e vê SÓ a(s) obra(s) dele — progresso, etapas, fotos e novidades marcados como visíveis, e manda recado/aprova o andamento. Não tem acesso a mais nada do sistema.
 - `admin.html` — painel de administração (só aparece na barra lateral pra quem tem a conta marcada como admin): aprova contas novas, promove/bloqueia gente da equipe e mostra o log de atividade (quem salvou/abriu o quê e quando).
 - `auth.js` — login, criação de conta, aprovação e a barra lateral, compartilhado por todas as páginas.
 - `shell.css` — visual da barra lateral/menu/telas de login.
