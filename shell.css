@@ -181,3 +181,16 @@ body.gsj-has-shell { margin: 0 !important; padding: 0 !important; }
 .gsj-auth-pending { text-align: center; }
 .gsj-auth-pending .gsj-auth-icon { font-size: 34px; margin-bottom: 10px; }
 [hidden] { display: none !important; }
+
+/* ---------------- troca de página sem "piscar" ---------------- */
+html.gsj-pending body { visibility: hidden; }
+
+/* navegadores recentes fazem uma transição suave entre páginas do mesmo site; a barra lateral
+   é a mesma em todas, então fica parada enquanto só o conteúdo muda */
+@view-transition { navigation: auto; }
+.gsj-sidebar { view-transition-name: gsj-sidebar; }
+::view-transition-group(gsj-sidebar) { animation-duration: 0s; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.16s; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}

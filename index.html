@@ -151,20 +151,34 @@
       } catch (e) {}
     }
     var tiles = document.querySelectorAll("#statGrid .num");
+    // mostra na hora os números da última visita; os de agora chegam em seguida
+    try {
+      var last = JSON.parse(sessionStorage.getItem("gsj_stats") || "null");
+      if (last) last.forEach(function (v, i) { if (tiles[i] && v != null) tiles[i].textContent = v; });
+    } catch (e) {}
+    function remember(i, v) {
+      try {
+        var arr = JSON.parse(sessionStorage.getItem("gsj_stats") || "[]") || [];
+        arr[i] = v;
+        sessionStorage.setItem("gsj_stats", JSON.stringify(arr));
+      } catch (e) {}
+    }
     var tables = ["gsj_orcamentos", "gsj_contratos", "gsj_recibos", "gsj_termos_entrega", "gsj_planos_corte"];
-    tables.forEach(function (table, i) {
-      GSJ.sb.from(table).select("id", { count: "exact", head: true }).then(function (res) {
-        tiles[i].textContent = (res.count == null ? "—" : res.count);
-      }, function () {
+    // número novo entra; se a consulta falhar, fica o da última visita (nunca apaga pra "—")
+    function setTile(i, res) {
+      if (res && !res.error && res.count != null) {
+        tiles[i].textContent = res.count;
+        remember(i, res.count);
+      } else if (!/\d/.test(tiles[i].textContent)) {
         tiles[i].textContent = "—";
-      });
+      }
+    }
+    tables.forEach(function (table, i) {
+      GSJ.sb.from(table).select("id", { count: "exact", head: true }).then(function (res) { setTile(i, res); }, function () { setTile(i, null); });
     });
     // 6º tile: obras ativas na Área do cliente (não concluídas)
-    GSJ.sb.from("gsj_obras").select("id", { count: "exact", head: true }).neq("status", "concluido").then(function (res) {
-      tiles[5].textContent = (res.count == null ? "—" : res.count);
-    }, function () {
-      tiles[5].textContent = "—";
-    });
+    GSJ.sb.from("gsj_obras").select("id", { count: "exact", head: true }).neq("status", "concluido")
+      .then(function (res) { setTile(5, res); }, function () { setTile(5, null); });
   });
 
   if ("serviceWorker" in navigator) {

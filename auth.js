@@ -24,6 +24,38 @@
   GSJ.sb = sb;
   GSJ.user = null;
 
+  // Esconde a página por um instante até a barra lateral ser montada (evita "pulo" visual
+  // ao trocar de página). Uma trava de segurança tira o esconder sozinha se algo falhar.
+  document.documentElement.classList.add("gsj-pending");
+  setTimeout(function () { document.documentElement.classList.remove("gsj-pending"); }, 3000);
+
+  // Sessão do supabase-js fica no localStorage; o perfil (nome/papel/aprovado) é guardado aqui
+  // pra a página abrir NA HORA, sem tela de "carregando" — a conferência real roda depois, por baixo.
+  var SB_STORAGE_KEY = "sb-brulthsmuhwftodbnhpg-auth-token";
+  var PROFILE_CACHE_KEY = "gsj_profile_cache_v1";
+  function readCachedProfile() {
+    try {
+      var raw = localStorage.getItem(SB_STORAGE_KEY);
+      if (!raw) return null;
+      var sess = JSON.parse(raw);
+      var uid = sess && sess.user && sess.user.id;
+      if (!uid) return null;
+      var p = JSON.parse(localStorage.getItem(PROFILE_CACHE_KEY) || "null");
+      if (!p || p.id !== uid || !p.approved) return null;
+      return p;
+    } catch (e) { return null; }
+  }
+  function writeProfileCache(id, profile) {
+    try {
+      localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify({
+        id: id, username: profile.username, nome: profile.nome, role: profile.role, approved: !!profile.approved
+      }));
+    } catch (e) {}
+  }
+  function clearProfileCache() {
+    try { localStorage.removeItem(PROFILE_CACHE_KEY); } catch (e) {}
+  }
+
   var NAV_ITEMS = [
     { key: "inicio", href: "./index.html", label: "Início", icon: "🏠" },
     { key: "orcamento", href: "./orcamento.html", label: "Orçamento", icon: "📋" },
@@ -85,6 +117,7 @@
   };
 
   GSJ.logout = function () {
+    clearProfileCache();
     if (!sb) return;
     sb.auth.signOut().finally(function () {
       location.reload();
@@ -350,21 +383,26 @@
     var contentId = opts.contentId || "gsjPageRoot";
 
     return new Promise(function (resolve) {
+      var resolved = false;
+      function resolveOnce(v) { if (!resolved) { resolved = true; resolve(v); } }
+
       function start() {
         var contentRoot = document.getElementById(contentId);
-        if (!contentRoot) { resolve(null); return; }
-        var sidebar = buildShell(contentRoot, page);
-        var gateRefs = buildGate();
-        renderLoading(gateRefs.box);
+        if (!contentRoot) { document.documentElement.classList.remove("gsj-pending"); resolveOnce(null); return; }
+        buildShell(contentRoot, page);
+        document.documentElement.classList.remove("gsj-pending");
+
+        var gateRefs = null;
+        function ensureGate() { if (!gateRefs) gateRefs = buildGate(); return gateRefs; }
+        function removeGate() { if (gateRefs) { gateRefs.gate.remove(); gateRefs = null; } }
 
         if (!sb) {
-          renderFatalError(gateRefs.box, "A biblioteca da nuvem não carregou — recarregue a página.");
+          renderFatalError(ensureGate().box, "A biblioteca da nuvem não carregou — recarregue a página.");
           return;
         }
 
-        function revealApp(authUser, profile) {
-          GSJ.user = { id: authUser.id, username: profile.username, nome: profile.nome, role: profile.role };
-          gateRefs.gate.remove();
+        function applyUser(authUserId, profile) {
+          GSJ.user = { id: authUserId, username: profile.username, nome: profile.nome, role: profile.role };
           var info = document.getElementById("gsjUserInfo");
           if (info) {
             info.innerHTML = "<strong>" + esc(profile.nome || profile.username) + "</strong>" +
@@ -372,22 +410,29 @@
           }
           var adminLink = document.getElementById("gsjAdminLink");
           if (adminLink) adminLink.hidden = profile.role !== "admin";
-          resolve(GSJ.user);
+        }
+
+        function revealApp(authUser, profile) {
+          applyUser(authUser.id, profile);
+          writeProfileCache(authUser.id, profile);
+          removeGate();
+          resolveOnce(GSJ.user);
         }
 
         function checkProfile(authUser, justLoggedIn) {
-          renderLoading(gateRefs.box);
+          renderLoading(ensureGate().box);
           sb.from("gsj_profiles")
             .select("username, nome, role, approved")
             .eq("id", authUser.id)
             .single()
             .then(function (res) {
               if (res.error || !res.data) {
-                renderFatalError(gateRefs.box, "Não encontramos seu perfil ainda. Se você acabou de criar a conta, aguarde alguns segundos e tente de novo.");
+                renderFatalError(ensureGate().box, "Não encontramos seu perfil ainda. Se você acabou de criar a conta, aguarde alguns segundos e tente de novo.");
                 return;
               }
               if (!res.data.approved) {
-                renderPending(gateRefs.box, res.data);
+                clearProfileCache();
+                renderPending(ensureGate().box, res.data);
                 window.__gsjRecheck = function () { checkProfile(authUser, false); };
                 return;
               }
@@ -395,20 +440,47 @@
               if (justLoggedIn) GSJ.logAction("login", null, null);
             })
             .catch(function () {
-              renderFatalError(gateRefs.box, "Não deu pra verificar sua conta agora — verifique sua internet e tente de novo.");
+              renderFatalError(ensureGate().box, "Não deu pra verificar sua conta agora — verifique sua internet e tente de novo.");
             });
         }
 
+        function showLoginGate() {
+          GSJ.user = null;
+          clearProfileCache();
+          renderLogin(ensureGate().box, checkProfile);
+        }
+
+        var cached = readCachedProfile();
+        if (cached) {
+          // abre direto, sem tela de carregando; a confirmação roda por baixo
+          applyUser(cached.id, cached);
+          resolveOnce(GSJ.user);
+          sb.auth.getSession().then(function (res) {
+            if (res.error) return;                       // sem rede: segue com o que já tem
+            var session = res.data && res.data.session;
+            if (!session) { showLoginGate(); return; }
+            return sb.from("gsj_profiles").select("username, nome, role, approved").eq("id", session.user.id).single().then(function (r2) {
+              if (r2.error || !r2.data) return;          // erro passageiro: não atrapalha
+              if (!r2.data.approved) {
+                clearProfileCache();
+                renderPending(ensureGate().box, r2.data);
+                window.__gsjRecheck = function () { checkProfile(session.user, false); };
+                return;
+              }
+              applyUser(session.user.id, r2.data);
+              writeProfileCache(session.user.id, r2.data);
+            });
+          }).catch(function () {});
+          return;
+        }
+
+        // primeira vez / sem cache: fluxo normal com a tela de verificação
+        renderLoading(ensureGate().box);
         sb.auth.getSession().then(function (res) {
           var session = res.data && res.data.session;
-          if (!session) {
-            renderLogin(gateRefs.box, checkProfile);
-            return;
-          }
+          if (!session) { showLoginGate(); return; }
           checkProfile(session.user, false);
-        }).catch(function () {
-          renderLogin(gateRefs.box, checkProfile);
-        });
+        }).catch(function () { showLoginGate(); });
       }
 
       if (document.readyState === "loading") {
