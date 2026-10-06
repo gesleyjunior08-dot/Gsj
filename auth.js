@@ -30,7 +30,8 @@
     { key: "contrato", href: "./contrato.html", label: "Contrato", icon: "📄" },
     { key: "recibo", href: "./recibo.html", label: "Recibo", icon: "🧾" },
     { key: "termo", href: "./termo-entrega.html", label: "Termo de Entrega", icon: "📦" },
-    { key: "plano", href: "./plano-de-cortes.html", label: "Plano de Cortes", icon: "📐" }
+    { key: "plano", href: "./plano-de-cortes.html", label: "Plano de Cortes", icon: "📐" },
+    { key: "obras", href: "./obras.html", label: "Área do cliente", icon: "👥" }
   ];
 
   function esc(s) {
@@ -128,7 +129,10 @@
       '</div>';
 
     var main = document.createElement("main");
-    main.className = "gsj-main";
+    // as 5 ferramentas trazem o próprio padding no <body>; com a barra lateral, esse espaço passa pra cá
+    var isTool = ["orcamento", "contrato", "recibo", "termo", "plano"].indexOf(page) >= 0;
+    main.className = "gsj-main" + (isTool ? " gsj-tool" : "");
+    document.body.classList.add("gsj-has-shell");
 
     contentRoot.parentNode.insertBefore(shell, contentRoot);
     main.appendChild(contentRoot);
@@ -140,10 +144,12 @@
     function closeSidebar() {
       sidebar.classList.remove("open");
       overlay.hidden = true;
+      menuBtn.hidden = false;
     }
     menuBtn.addEventListener("click", function () {
       sidebar.classList.add("open");
       overlay.hidden = false;
+      menuBtn.hidden = true;
     });
     overlay.addEventListener("click", closeSidebar);
     sidebar.addEventListener("click", function (e) {
@@ -163,6 +169,10 @@
     var box = document.createElement("div");
     box.className = "gsj-auth-box";
     box.id = "gsjAuthBox";
+    var brand = document.createElement("div");
+    brand.className = "gsj-auth-brand";
+    brand.innerHTML = '<span class="badge">GSJ</span><span class="name">GSJ Marcenaria<small>Móveis planejados</small></span>';
+    gate.appendChild(brand);
     gate.appendChild(box);
     document.body.appendChild(gate);
     return { gate: gate, box: box };
@@ -177,8 +187,8 @@
   function renderLogin(box, onDone) {
     box.innerHTML =
       '<div class="gsj-auth-badge">GSJ</div>' +
-      '<h2>Entrar</h2>' +
-      '<p class="gsj-auth-sub">Acesse com o usuário e senha da sua conta.</p>' +
+      '<h2>Controle de acesso</h2>' +
+      '<p class="gsj-auth-sub">Entre com seu usuário e senha.</p>' +
       '<p class="gsj-auth-error" id="gsjErr" hidden></p>' +
       '<form id="gsjLoginForm">' +
         '<div class="gsj-auth-field"><label for="gsjLUser">Usuário</label><input id="gsjLUser" autocomplete="username" autocapitalize="off" /></div>' +
