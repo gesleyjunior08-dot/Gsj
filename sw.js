@@ -7,7 +7,7 @@
 // Pra publicar uma atualização: troque o número da versão abaixo
 // (CACHE_VERSION) sempre que mudar algum arquivo. Sem isso, quem já
 // instalou o app pode continuar vendo a versão antiga por um tempo.
-const CACHE_VERSION = "v8";
+const CACHE_VERSION = "v9";
 const CACHE_NAME = "gsj-app-" + CACHE_VERSION;
 
 const PRECACHE_URLS = [
