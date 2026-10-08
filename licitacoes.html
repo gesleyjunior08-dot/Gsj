@@ -1,0 +1,383 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Licitações · GSJ Marcenaria</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#954f14">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GSJ">
+<style>
+  html { color-scheme: light dark; }
+  body { margin: 0; }
+
+  @import url("https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Source+Sans+3:wght@400;500;600;700&display=swap");
+
+  :root {
+    --bg: #faf6ef; --surface: #ffffff; --surface-2: #fffdf9;
+    --text: #2b2118; --text-muted: #6b5d4f;
+    --accent: #954f14; --accent-2: #c9832e; --accent-soft: #f4e9da;
+    --line: #e3d9c8; --danger: #a6402f; --danger-soft: #f4e1dc;
+    --ok: #3f7d4a; --ok-soft: #e3f0e4;
+    --shadow: 0 1px 2px rgba(43, 33, 24, 0.05), 0 12px 32px rgba(43, 33, 24, 0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
+      --text: #efe7da; --text-muted: #b3a591;
+      --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
+      --line: #3c3226; --danger: #d97d68; --danger-soft: #3a241f;
+      --ok: #7dbb86; --ok-soft: #223027;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
+    --text: #efe7da; --text-muted: #b3a591;
+    --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
+    --line: #3c3226; --danger: #d97d68; --danger-soft: #3a241f;
+    --ok: #7dbb86; --ok-soft: #223027;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--text);
+    font: inherit; font-weight: 600; font-size: 13.5px; padding: 8px 13px; cursor: pointer;
+    text-decoration: none; white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 36px 24px 60px; }
+  h1 { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: clamp(26px, 5vw, 34px); margin: 0 0 6px; }
+  .tagline { font-size: 15px; margin: 0; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; box-shadow: var(--shadow); margin-bottom: 20px; }
+  .card h2 { font-family: "Newsreader", ui-serif, Georgia, serif; font-size: 18px; margin: 0 0 4px; }
+  .card .sub { font-size: 13.5px; color: var(--text-muted); margin: 0; }
+
+  .notif { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  .notif-info { min-width: 220px; flex: 1 1 280px; }
+  .notif-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .state { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-muted); }
+  .dot.on { background: var(--ok); }
+  .dot.off { background: var(--danger); }
+
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .chip {
+    border: 1px solid var(--line); background: var(--surface); color: var(--text); font: inherit; font-size: 13px; font-weight: 600;
+    padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  }
+  .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .toolbar input, .toolbar select {
+    font: inherit; font-size: 13.5px; padding: 7px 11px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--text); min-width: 0;
+  }
+  .toolbar input { flex: 1 1 180px; }
+  .count { color: var(--text-muted); font-size: 13px; margin: 0 0 12px; }
+
+  .lic { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; margin-bottom: 12px; box-shadow: var(--shadow); }
+  .lic.nova { border-color: var(--accent-2); }
+  .lic-top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+  .badge-nova { background: var(--accent); color: #fff; }
+  .badge-obra { background: var(--accent-soft); color: var(--accent); }
+  .badge-moveis { background: var(--ok-soft); color: var(--ok); }
+  .badge-city { background: transparent; border: 1px solid var(--line); color: var(--text-muted); }
+  .lic h3 { font-size: 15px; line-height: 1.4; margin: 0 0 8px; font-weight: 600; overflow-wrap: anywhere; }
+  .lic-meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+  .lic-meta b { color: var(--text); font-weight: 600; }
+  .prazo-urgente { color: var(--danger); font-weight: 700; }
+  .empty { color: var(--text-muted); font-size: 14px; padding: 18px 0; text-align: center; }
+  .msg { font-size: 13px; margin-top: 10px; }
+  .msg.err { color: var(--danger); }
+  .fonte { font-size: 12px; color: var(--text-muted); margin-top: 18px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+  <div class="app" id="gsjPageRoot">
+    <div class="wrap">
+      <div class="gsj-hero">
+        <div class="hero-row">
+          <div>
+            <span class="eyebrow">Perto de Juiz de Fora</span>
+            <h1>Licitações</h1>
+            <p class="tagline">Obras, reformas e móveis abertos em Juiz de Fora e cidades vizinhas. A busca roda todo dia às 8h.</p>
+          </div>
+          <button class="btn" id="refreshBtn" type="button">↻ Buscar agora</button>
+        </div>
+      </div>
+
+      <div class="card" id="notifCard">
+        <div class="notif">
+          <div class="notif-info">
+            <div class="state"><span class="dot" id="notifDot"></span><span id="notifState">Verificando…</span></div>
+            <p class="sub" id="notifHelp">Receba um aviso no celular quando aparecer licitação nova.</p>
+          </div>
+          <div class="notif-actions">
+            <button class="btn btn-primary" id="notifOn" type="button" hidden>🔔 Ativar avisos neste aparelho</button>
+            <button class="btn" id="notifTest" type="button" hidden>Enviar teste</button>
+            <button class="btn" id="notifOff" type="button" hidden>Desativar</button>
+          </div>
+        </div>
+        <div class="msg" id="notifMsg" hidden></div>
+      </div>
+
+      <div class="toolbar" id="toolbar">
+        <button class="chip" data-f="todas" aria-pressed="true" type="button">Todas</button>
+        <button class="chip" data-f="novas" aria-pressed="false" type="button">Novas</button>
+        <button class="chip" data-f="obra" aria-pressed="false" type="button">Obras e reformas</button>
+        <button class="chip" data-f="moveis" aria-pressed="false" type="button">Móveis</button>
+        <select id="cidade" aria-label="Cidade"><option value="">Todas as cidades</option></select>
+        <input id="busca" type="search" placeholder="Buscar no texto…" aria-label="Buscar">
+      </div>
+      <p class="count" id="count"></p>
+
+      <div id="lista"><span class="gsj-skel"></span><span class="gsj-skel"></span><span class="gsj-skel"></span></div>
+
+      <p class="fonte" id="fonte">Fonte: PNCP (Portal Nacional de Contratações Públicas). Confira sempre o edital completo antes de participar.</p>
+    </div>
+  </div>
+
+<link rel="stylesheet" href="./shell.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./auth.js"></script>
+<script>
+  var VISTO_KEY = "gsj_licit_visto_v1";
+  var state = { rows: [], filtro: "todas", cidade: "", busca: "", visto: null, vapid: null };
+
+  function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function brl(v) { return v == null || Number(v) <= 1 ? null : Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }); }
+  function fmtDia(iso) { try { return new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }); } catch (e) { return "—"; } }
+  function diasAte(iso) { return Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000); }
+  function norm(s) { return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  function setMsg(id, txt, err) { var el = document.getElementById(id); el.hidden = !txt; el.textContent = txt || ""; el.className = "msg" + (err ? " err" : ""); }
+
+  // ---------------- lista ----------------
+  function isNova(r) {
+    var t = new Date(r.first_seen_at).getTime();
+    return state.visto ? t > state.visto : (Date.now() - t) < 3 * 86400000;
+  }
+  function filtradas() {
+    var q = norm(state.busca);
+    return state.rows.filter(function (r) {
+      if (state.filtro === "novas" && !isNova(r)) return false;
+      if ((state.filtro === "obra" || state.filtro === "moveis") && (r.categorias || []).indexOf(state.filtro) < 0) return false;
+      if (state.cidade && r.municipio !== state.cidade) return false;
+      if (q && norm(r.objeto + " " + r.orgao + " " + r.municipio).indexOf(q) < 0) return false;
+      return true;
+    });
+  }
+  function render() {
+    var rows = filtradas();
+    document.getElementById("count").textContent = rows.length + (rows.length === 1 ? " licitação aberta" : " licitações abertas");
+    var box = document.getElementById("lista");
+    if (!rows.length) {
+      box.innerHTML = '<p class="empty">Nenhuma licitação com esse filtro agora. A busca roda todo dia às 8h.</p>';
+      return;
+    }
+    box.innerHTML = rows.map(function (r) {
+      var dias = r.data_encerramento ? diasAte(r.data_encerramento) : null;
+      var prazo = r.data_encerramento
+        ? '<span class="' + (dias <= 2 ? "prazo-urgente" : "") + '">Propostas até <b>' + fmtDia(r.data_encerramento) + "</b>" +
+          (dias <= 0 ? " (hoje)" : dias === 1 ? " (amanhã)" : " (" + dias + " dias)") + "</span>"
+        : "";
+      var cats = (r.categorias || []).map(function (c) {
+        return c === "moveis" ? '<span class="badge badge-moveis">Móveis</span>' : '<span class="badge badge-obra">Obra / reforma</span>';
+      }).join("");
+      var valor = brl(r.valor_estimado);
+      return '<div class="lic' + (isNova(r) ? " nova" : "") + '">' +
+        '<div class="lic-top">' + (isNova(r) ? '<span class="badge badge-nova">Nova</span>' : "") + cats +
+        '<span class="badge badge-city">' + esc(r.municipio || "—") + "</span></div>" +
+        "<h3>" + esc(r.objeto) + "</h3>" +
+        '<div class="lic-meta"><span>' + esc(r.orgao || "") + "</span>" +
+        (r.modalidade ? "<span>" + esc(r.modalidade) + "</span>" : "") +
+        (valor ? "<span>Estimado <b>" + valor + "</b></span>" : "") + prazo + "</div>" +
+        (r.link ? '<a class="btn" href="' + esc(r.link) + '" target="_blank" rel="noopener">Abrir edital no PNCP ↗</a>' : "") +
+        "</div>";
+    }).join("");
+  }
+  function preencherCidades() {
+    var sel = document.getElementById("cidade"), set = {};
+    state.rows.forEach(function (r) { if (r.municipio) set[r.municipio] = 1; });
+    var cur = sel.value;
+    sel.innerHTML = '<option value="">Todas as cidades</option>' + Object.keys(set).sort().map(function (c) {
+      return '<option value="' + esc(c) + '">' + esc(c) + "</option>";
+    }).join("");
+    sel.value = cur;
+  }
+  function load() {
+    var agora = new Date().toISOString();
+    return GSJ.sb.from("gsj_licitacoes").select("*")
+      .not("categorias", "eq", "{}")
+      .or("data_encerramento.gte." + agora + ",data_encerramento.is.null")
+      .order("data_encerramento", { ascending: true, nullsFirst: false })
+      .limit(500)
+      .then(function (res) {
+        if (res.error) {
+          document.getElementById("lista").innerHTML = '<p class="empty">Não deu pra carregar agora: ' + esc(res.error.message) + "</p>";
+          return;
+        }
+        state.rows = res.data || [];
+        preencherCidades();
+        render();
+      });
+  }
+  function marcarVisto() {
+    try { localStorage.setItem(VISTO_KEY, String(Date.now())); } catch (e) {}
+  }
+
+  // ---------------- info da última busca ----------------
+  function carregarInfo() {
+    return GSJ.sb.rpc("gsj_licitacoes_info").then(function (res) {
+      var info = res.data;
+      if (!info) return;
+      state.vapid = info.vapid_public;
+      if (info.last_run) {
+        try {
+          var lr = JSON.parse(info.last_run);
+          document.getElementById("fonte").textContent =
+            "Última busca: " + new Date(lr.at).toLocaleString("pt-BR") + " — " + lr.cidades + " cidades, " +
+            lr.relevantes + " licitações de obra/móveis abertas. Fonte: PNCP (Portal Nacional de Contratações Públicas). Confira sempre o edital completo antes de participar.";
+        } catch (e) {}
+      }
+      iniciarNotif();
+    });
+  }
+
+  // ---------------- notificações (web push) ----------------
+  function b64ToU8(b64) {
+    var pad = "=".repeat((4 - b64.length % 4) % 4);
+    var raw = atob((b64 + pad).replace(/-/g, "+").replace(/_/g, "/"));
+    var out = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+    return out;
+  }
+  function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+  function isStandalone() { return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; }
+  function setNotifUI(kind, text, help) {
+    document.getElementById("notifDot").className = "dot " + (kind === "on" ? "on" : kind === "off" ? "off" : "");
+    document.getElementById("notifState").textContent = text;
+    if (help) document.getElementById("notifHelp").textContent = help;
+    document.getElementById("notifOn").hidden = kind !== "off";
+    document.getElementById("notifTest").hidden = kind !== "on";
+    document.getElementById("notifOff").hidden = kind !== "on";
+  }
+  function iniciarNotif() {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+      if (isIOS() && !isStandalone()) {
+        setNotifUI("none", "Instale o app para receber avisos", "No iPhone: toque em Compartilhar (⬆️) no Safari, depois em “Adicionar à Tela de Início”, e abra o app pelo ícone. Aí volte aqui e ative os avisos.");
+      } else {
+        setNotifUI("none", "Este navegador não recebe avisos", "Você ainda vê as licitações aqui na página. Para receber avisos no celular, abra o app instalado no Chrome (Android) ou na Tela de Início (iPhone).");
+      }
+      return;
+    }
+    if (Notification.permission === "denied") {
+      setNotifUI("none", "Avisos bloqueados neste aparelho", "Libere as notificações do app nas configurações do celular/navegador e volte aqui.");
+      return;
+    }
+    navigator.serviceWorker.ready.then(function (reg) { return reg.pushManager.getSubscription(); }).then(function (sub) {
+      if (sub && Notification.permission === "granted") {
+        // garante que a inscrição está salva (caso tenha sido apagada no servidor)
+        salvarInscricao(sub);
+        setNotifUI("on", "Avisos ativados neste aparelho", "Você recebe uma notificação quando a busca das 8h achar licitação nova.");
+      } else {
+        setNotifUI("off", "Avisos desativados", "Receba um aviso no celular quando aparecer licitação nova.");
+      }
+    }).catch(function () { setNotifUI("none", "Não foi possível verificar os avisos", ""); });
+  }
+  function salvarInscricao(sub) {
+    var j = sub.toJSON();
+    return GSJ.sb.from("gsj_push_subs").upsert({
+      user_id: GSJ.user.id, endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth,
+      user_agent: navigator.userAgent.slice(0, 200)
+    }, { onConflict: "endpoint" });
+  }
+  function ativar() {
+    var btn = document.getElementById("notifOn");
+    btn.disabled = true; setMsg("notifMsg", "");
+    if (!state.vapid) { setMsg("notifMsg", "Não consegui a chave de avisos. Tente recarregar a página.", true); btn.disabled = false; return; }
+    Notification.requestPermission().then(function (perm) {
+      if (perm !== "granted") { setNotifUI("none", "Avisos bloqueados neste aparelho", "Você não permitiu as notificações. Libere nas configurações do aparelho e tente de novo."); throw new Error("negado"); }
+      return navigator.serviceWorker.ready;
+    }).then(function (reg) {
+      return reg.pushManager.getSubscription().then(function (s) {
+        return s || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(state.vapid) });
+      });
+    }).then(function (sub) { return salvarInscricao(sub).then(function (r) { if (r.error) throw new Error(r.error.message); }); })
+      .then(function () {
+        setNotifUI("on", "Avisos ativados neste aparelho", "Você recebe uma notificação quando a busca das 8h achar licitação nova.");
+        testar();
+      })
+      .catch(function (e) { if (e.message !== "negado") setMsg("notifMsg", "Não deu pra ativar: " + e.message, true); })
+      .then(function () { btn.disabled = false; });
+  }
+  function desativar() {
+    navigator.serviceWorker.ready.then(function (reg) { return reg.pushManager.getSubscription(); }).then(function (sub) {
+      if (!sub) return;
+      var ep = sub.endpoint;
+      return sub.unsubscribe().then(function () { return GSJ.sb.from("gsj_push_subs").delete().eq("endpoint", ep); });
+    }).then(function () { setNotifUI("off", "Avisos desativados", "Receba um aviso no celular quando aparecer licitação nova."); setMsg("notifMsg", ""); });
+  }
+  function chamarFuncao(body) {
+    return GSJ.sb.functions.invoke("gsj-licitacoes", { body: body }).then(function (res) {
+      if (res.error) {
+        var m = res.error.message || "erro";
+        if (res.error.context && res.error.context.json) {
+          return res.error.context.json().then(function (j) { throw new Error((j && (j.error || j.message)) || m); }, function () { throw new Error(m); });
+        }
+        throw new Error(m);
+      }
+      return res.data;
+    });
+  }
+  function testar() {
+    setMsg("notifMsg", "Enviando teste…");
+    chamarFuncao({ action: "test_push" }).then(function (d) {
+      var p = d && d.push;
+      setMsg("notifMsg", p && p.enviados ? "Teste enviado — a notificação deve aparecer em instantes." : "O teste não chegou a nenhum aparelho. Tente desativar e ativar de novo.", !(p && p.enviados));
+    }).catch(function (e) { setMsg("notifMsg", "Não deu pra enviar o teste: " + e.message, true); });
+  }
+
+  // ---------------- buscar agora ----------------
+  function buscarAgora() {
+    var btn = document.getElementById("refreshBtn");
+    btn.disabled = true; btn.textContent = "Buscando…";
+    chamarFuncao({}).then(function (d) {
+      if (d && d.pulado) return;
+      return Promise.all([load(), carregarInfo()]);
+    }).then(function () { btn.textContent = "✓ Atualizado"; })
+      .catch(function (e) { btn.textContent = "Erro ao buscar"; setMsg("notifMsg", "Busca falhou: " + e.message, true); })
+      .then(function () { setTimeout(function () { btn.disabled = false; btn.textContent = "↻ Buscar agora"; }, 2500); });
+  }
+
+  // ---------------- início ----------------
+  GSJ.boot({ page: "licitacoes" }).then(function (user) {
+    if (!user) return;
+    try { state.visto = Number(localStorage.getItem(VISTO_KEY)) || null; } catch (e) {}
+    document.getElementById("toolbar").addEventListener("click", function (ev) {
+      var b = ev.target.closest(".chip"); if (!b) return;
+      state.filtro = b.getAttribute("data-f");
+      Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (c) { c.setAttribute("aria-pressed", c === b ? "true" : "false"); });
+      render();
+    });
+    document.getElementById("cidade").addEventListener("change", function (e) { state.cidade = e.target.value; render(); });
+    document.getElementById("busca").addEventListener("input", function (e) { state.busca = e.target.value; render(); });
+    document.getElementById("notifOn").addEventListener("click", ativar);
+    document.getElementById("notifOff").addEventListener("click", desativar);
+    document.getElementById("notifTest").addEventListener("click", testar);
+    document.getElementById("refreshBtn").addEventListener("click", buscarAgora);
+    load().then(function () { setTimeout(marcarVisto, 4000); });
+    carregarInfo();
+  });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("./sw.js").catch(function () {}); });
+  }
+</script>
+</body></html>

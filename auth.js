@@ -76,7 +76,8 @@
     { key: "recibo", href: "./recibo.html", label: "Recibo", icon: "🧾" },
     { key: "termo", href: "./termo-entrega.html", label: "Termo de Entrega", icon: "📦" },
     { key: "plano", href: "./plano-de-cortes.html", label: "Plano de Cortes", icon: "📐" },
-    { key: "obras", href: "./obras.html", label: "Área do cliente", icon: "👥" }
+    { key: "obras", href: "./obras.html", label: "Área do cliente", icon: "👥" },
+    { key: "licitacoes", href: "./licitacoes.html", label: "Licitações", icon: "🏗️" }
   ];
 
   function esc(s) {
