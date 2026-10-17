@@ -259,6 +259,7 @@
 <link rel="stylesheet" href="./shell.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./auth.js"></script>
+<script src="./wpp.js"></script>
 <script>window.GSJ && window.GSJ.boot({ page: "termo" });</script>
 </head>
 <body>
@@ -478,6 +479,14 @@
 
   document.getElementById("btnPrint").addEventListener("click", function () {
     window.print();
+  });
+
+  // Enviar direto pelo WhatsApp (PDF anexado) — ver wpp.js
+  if (window.GSJ && GSJ.wpp) GSJ.wpp.attach({
+    doc: "Termo de Entrega", key: "termo-entrega", format: "a5", margin: [10, 12],
+    cliente: function () { return state.clienteNome; },
+    telefone: function () { return ""; },
+    ref: function () { return state.ref; }
   });
 
   // ---- nuvem: salvar / abrir termos compartilhados ----

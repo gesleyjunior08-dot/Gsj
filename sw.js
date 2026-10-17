@@ -7,7 +7,7 @@
 // Pra publicar uma atualização: troque o número da versão abaixo
 // (CACHE_VERSION) sempre que mudar algum arquivo. Sem isso, quem já
 // instalou o app pode continuar vendo a versão antiga por um tempo.
-const CACHE_VERSION = "v9";
+const CACHE_VERSION = "v10";
 const CACHE_NAME = "gsj-app-" + CACHE_VERSION;
 
 const PRECACHE_URLS = [
@@ -25,6 +25,7 @@ const PRECACHE_URLS = [
   "./manifest.webmanifest",
   "./shell.css",
   "./auth.js",
+  "./wpp.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-maskable-512.png"
@@ -54,9 +55,11 @@ self.addEventListener("fetch", function (event) {
 
   const url = new URL(req.url);
 
-  // biblioteca do Supabase (CDN): guarda em cache pra a página não esperar a internet
+  // bibliotecas de CDN (Supabase e as de PDF do WhatsApp): guarda em cache pra a página não esperar a internet
   // a cada troca de tela. Só ela — o resto dos CDNs e a nuvem seguem direto.
-  if (req.method === "GET" && url.hostname === "cdn.jsdelivr.net" && url.pathname.indexOf("/npm/@supabase/supabase-js") === 0) {
+  const ehLibPdf = url.hostname === "cdnjs.cloudflare.com" &&
+    (url.pathname.indexOf("/html2canvas/") !== -1 || url.pathname.indexOf("/jspdf/") !== -1);
+  if (req.method === "GET" && ((url.hostname === "cdn.jsdelivr.net" && url.pathname.indexOf("/npm/@supabase/supabase-js") === 0) || ehLibPdf)) {
     event.respondWith(
       caches.match(req).then(function (cached) {
         const network = fetch(req).then(function (response) {

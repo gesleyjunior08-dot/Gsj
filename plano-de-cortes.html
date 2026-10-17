@@ -357,6 +357,7 @@
 <link rel="stylesheet" href="./shell.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./auth.js"></script>
+<script src="./wpp.js"></script>
 <script>window.GSJ && window.GSJ.boot({ page: "plano" });</script>
 </head>
 <body>
@@ -753,6 +754,14 @@
 
   document.getElementById("btnPrint").addEventListener("click", function () {
     window.print();
+  });
+
+  // Enviar direto pelo WhatsApp (PDF anexado) — ver wpp.js
+  if (window.GSJ && GSJ.wpp) GSJ.wpp.attach({
+    doc: "Plano de Cortes", key: "plano-de-cortes", saudacao: false, format: "a4", margin: [13, 15],
+    cliente: function () { return state.cliente; },
+    telefone: function () { return ""; },
+    ref: function () { return state.refId; }
   });
 
   // ---- nuvem: salvar / abrir planos compartilhados ----
