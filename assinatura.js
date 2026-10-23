@@ -14,6 +14,7 @@
   "use strict";
   var GSJ = (window.GSJ = window.GSJ || {});
 
+  var NOME_CARIMBO = "GSJ \u2014 Design em madeira";   // nome em letra de assinatura (opção só com carimbo)
   var RAZAO = "GSJ - DESIGN EM MADEIRA";   // razão social do CNPJ da GSJ
   var EXCLUI = { assinatura: 1, cloudId: 1, cloudStatus: 1, status: 1 };   // não contam como "conteúdo"
 
@@ -65,6 +66,7 @@
   var css =
     ".sig-signed{height:46px;display:flex;align-items:flex-end;justify-content:center}" +
     ".sig-signed img{max-height:44px;max-width:100%;display:block}" +
+    ".sig-signed .sig-nome{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:15px;line-height:1.1;color:#1b2a6b;padding-bottom:3px;text-align:center}" +
     ".sig-signed-sp{height:46px}" +
     ".sig-stamp{display:block;margin-top:3px;font-size:8.5px;line-height:1.35;color:#6b5d4f}" +
     ".sig-digital{display:flex;gap:7px;align-items:flex-start;margin-top:5px;padding-top:5px;border-top:1px solid #e3d9c8}" +
@@ -72,6 +74,9 @@
     ".sig-digital .sd-r{flex:1;font-family:Georgia,'Times New Roman',serif;font-size:7.6px;line-height:1.3;color:#3d3328}" +
     ".btn-assinar{display:flex;width:100%;justify-content:center;align-items:center;gap:8px;margin:0 0 8px;background:transparent;border:1.5px solid var(--accent,#954f14);color:var(--accent,#954f14);border-radius:10px;font:inherit;font-weight:700;font-size:14px;padding:11px 16px;cursor:pointer}" +
     ".btn-assinar:hover{background:rgba(149,79,20,.08)}" +
+    ".btn-assinar[hidden]{display:none!important}" +
+    ".btn-assinar.sec{background:transparent;border:1px solid var(--line,#d9cdb9);color:var(--text,#2b2118);font-weight:600}" +
+    ".btn-assinar.sec:hover{background:rgba(149,79,20,.06)}" +
     ".btn-assinar.feito{border-color:var(--line,#d9cdb9);color:var(--text-muted,#6b5d4f);font-weight:600}" +
     ".ass-box{margin:0 0 10px;font-size:12.5px;line-height:1.45;color:var(--text-muted,#6b5d4f)}" +
     ".ass-box[hidden]{display:none!important}" +
@@ -204,16 +209,16 @@
       if (a.hash !== hashDoc(state)) {
         state.assinatura = null;
         try { if (save) save(); } catch (e) {}
-        if (ui) ui.refresh("O documento foi alterado depois de assinado — a assinatura foi removida. Toque em Assinar de novo.");
+        if (ui) ui.refresh("O documento foi alterado depois de assinado — a assinatura foi removida. Assine de novo.");
       }
     },
-    spacer: function (state) { return state && state.assinatura && state.assinatura.img ? '<div class="sig-signed-sp"></div>' : ""; },
+    spacer: function (state) { return state && state.assinatura ? '<div class="sig-signed-sp"></div>' : ""; },
     col: function (state, original) {
       var a = state && state.assinatura;
-      if (!a || !a.img) return original;
+      if (!a) return original;
       var rot = (a.rotulo || []).map(esc).join("<br/>");
       return '<div class="sig-col">' +
-        '<div class="sig-signed"><img src="' + a.img + '" alt="Assinatura"/></div>' +
+        '<div class="sig-signed">' + (a.img ? '<img src="' + a.img + '" alt="Assinatura"/>' : '<span class="sig-nome">' + esc(NOME_CARIMBO) + '</span>') + '</div>' +
         '<div class="sig-line"></div>' +
         '<p class="sig-label">' + rot +
           (a.empresa ? '' : '<span class="sig-stamp">Assinado eletronicamente por ' + esc(a.nome) + ' em ' + esc(dataHora(a.em)) +
@@ -230,6 +235,9 @@
       var btn = document.createElement("button");
       btn.type = "button"; btn.id = "btnAssinar"; btn.className = "btn-assinar";
       btnPrint.insertAdjacentElement("beforebegin", btn);
+      var btnMao = document.createElement("button");
+      btnMao.type = "button"; btnMao.id = "btnAssinarMao"; btnMao.className = "btn-assinar sec";
+      btnPrint.insertAdjacentElement("beforebegin", btnMao);
       var box = document.createElement("div");
       box.id = "assBox"; box.className = "ass-box"; box.hidden = true; box.setAttribute("role", "status");
       btnPrint.insertAdjacentElement("beforebegin", box);
@@ -237,29 +245,34 @@
       function refresh(aviso) {
         var st = cfg.getState(), a = st && st.assinatura;
         box.textContent = ""; box.className = "ass-box";
-        if (a && a.img) {
-          btn.className = "btn-assinar feito"; btn.textContent = "Remover assinatura";
+        if (a) {
+          btn.className = "btn-assinar feito"; btn.textContent = "Remover assinatura"; btnMao.hidden = true;
           box.hidden = false; box.className = "ass-box ok";
           box.textContent = "✔ Assinado por " + a.nome + " em " + dataHora(a.em) + " · código " + a.codigo + ". O PDF e o WhatsApp saem assinados.";
-          var l = document.createElement("a"); l.textContent = "Trocar minha assinatura";
-          l.addEventListener("click", function () { abrirPad(function (img) { gravarAssinatura(img); assinar(false); }); });
-          box.appendChild(l);
+          if (a.img) {
+            var l = document.createElement("a"); l.textContent = "Trocar minha assinatura";
+            l.addEventListener("click", function () { abrirPad(function (img) { gravarAssinatura(img); assinar("mao", false); }); });
+            box.appendChild(l);
+          }
         } else {
-          btn.className = "btn-assinar"; btn.textContent = "✍️ Assinar";
+          btn.className = "btn-assinar"; btn.textContent = "✍️ Assinar (carimbo)";
+          btnMao.hidden = false; btnMao.textContent = "🖋️ Assinar com a minha assinatura";
           if (aviso) { box.hidden = false; box.className = "ass-box aviso"; box.textContent = aviso; }
           else box.hidden = true;
         }
       }
       ui = { refresh: refresh };
 
-      function assinar(enviar) {
+      // modo "carimbo": só o carimbo (sem desenho, sem escrever nada) — 1 toque
+      // modo "mao": com a assinatura desenhada pelo usuário (pede o desenho na 1ª vez neste aparelho)
+      function assinar(modo, enviar) {
         var st = cfg.getState();
-        var mina = lerAssinatura();
-        if (!mina) { abrirPad(function (img) { gravarAssinatura(img); assinar(enviar); }); return; }
+        var mina = modo === "mao" ? lerAssinatura() : null;
+        if (modo === "mao" && !mina) { abrirPad(function (img) { gravarAssinatura(img); assinar("mao", enviar); }); return; }
         var h = hashDoc(st);
         st.assinatura = {
-          img: mina.img,
-          nome: mina.nome || (GSJ.user && (GSJ.user.nome || GSJ.user.username)) || "GSJ",
+          modo: modo, img: mina ? mina.img : null,
+          nome: (mina && mina.nome) || (GSJ.user && (GSJ.user.nome || GSJ.user.username)) || "GSJ",
           rotulo: (cfg.rotulo && cfg.rotulo()) || [],
           empresa: { razao: (cfg.razao && cfg.razao()) || RAZAO, cnpj: (cfg.cnpj && cfg.cnpj()) || "" },
           em: new Date().toISOString(),
@@ -279,8 +292,9 @@
           if (GSJ.wpp && GSJ.wpp.reset) GSJ.wpp.reset();
           return;
         }
-        assinar(true);
+        assinar("carimbo", true);
       });
+      btnMao.addEventListener("click", function () { assinar("mao", true); });
       refresh();
     }
   };
