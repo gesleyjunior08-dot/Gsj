@@ -1483,6 +1483,7 @@
   // Assinar: aplica a assinatura da GSJ no documento e já abre o envio pelo WhatsApp — ver assinatura.js
   if (window.GSJ && GSJ.sign) GSJ.sign.attach({
     doc: "Orçamento", key: "orcamento",
+    cnpj: function () { return state.companyCnpj; },
     getState: function () { return state; },
     render: function () { updatePreview(); },
     save: function () { safeSave(); },

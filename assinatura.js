@@ -14,6 +14,7 @@
   "use strict";
   var GSJ = (window.GSJ = window.GSJ || {});
 
+  var RAZAO = "GSJ - DESIGN EM MADEIRA";   // razão social do CNPJ da GSJ
   var EXCLUI = { assinatura: 1, cloudId: 1, cloudStatus: 1, status: 1 };   // não contam como "conteúdo"
 
   // ---------------- código do documento (hash simples e estável) ----------------
@@ -66,6 +67,9 @@
     ".sig-signed img{max-height:44px;max-width:100%;display:block}" +
     ".sig-signed-sp{height:46px}" +
     ".sig-stamp{display:block;margin-top:3px;font-size:8.5px;line-height:1.35;color:#6b5d4f}" +
+    ".sig-digital{display:flex;gap:7px;align-items:flex-start;margin-top:5px;padding-top:5px;border-top:1px solid #e3d9c8}" +
+    ".sig-digital .sd-l{flex:0 0 40%;font-family:Arial,Helvetica,sans-serif;font-weight:600;font-size:9.5px;line-height:1.25;color:#2b2118;overflow-wrap:anywhere;text-transform:uppercase}" +
+    ".sig-digital .sd-r{flex:1;font-family:Georgia,'Times New Roman',serif;font-size:7.6px;line-height:1.3;color:#3d3328}" +
     ".btn-assinar{display:flex;width:100%;justify-content:center;align-items:center;gap:8px;margin:0 0 8px;background:transparent;border:1.5px solid var(--accent,#954f14);color:var(--accent,#954f14);border-radius:10px;font:inherit;font-weight:700;font-size:14px;padding:11px 16px;cursor:pointer}" +
     ".btn-assinar:hover{background:rgba(149,79,20,.08)}" +
     ".btn-assinar.feito{border-color:var(--line,#d9cdb9);color:var(--text-muted,#6b5d4f);font-weight:600}" +
@@ -169,6 +173,27 @@
   // ---------------- API usada pelas páginas ----------------
   var ui = null;   // { refresh(msgAviso?) } da página atual
 
+  // carimbo no estilo de assinatura digital de PDF (razão social + CNPJ | "Assinado eletronicamente por…")
+  function dadosStamp(iso) {
+    try {
+      var d = new Date(iso), p = {};
+      new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).formatToParts(d)
+        .forEach(function (x) { p[x.type] = x.value; });
+      return p.year + "." + p.month + "." + p.day + " " + p.hour + ":" + p.minute + ":" + p.second + " -03'00'";
+    } catch (e) { return iso; }
+  }
+  function carimbo(a) {
+    var cnpj = String(a.empresa.cnpj || "").replace(/\D/g, "");
+    var id = esc(a.empresa.razao) + (cnpj ? ":" + cnpj : "");
+    return '<div class="sig-digital">' +
+      '<div class="sd-l">' + esc(a.empresa.razao) + (a.empresa.cnpj ? '<br/>CNPJ: ' + esc(a.empresa.cnpj) : '') + '</div>' +
+      '<div class="sd-r">Assinado eletronicamente por ' + id +
+        '<br/>Dados: ' + esc(dadosStamp(a.em)) +
+        '<br/>Responsável: ' + esc(a.nome) + ' · Código do documento: ' + esc(a.codigo) + '</div>' +
+      '</div>';
+  }
+
   GSJ.sign = {
     _hash: hashDoc, _canon: canon,
 
@@ -191,8 +216,9 @@
         '<div class="sig-signed"><img src="' + a.img + '" alt="Assinatura"/></div>' +
         '<div class="sig-line"></div>' +
         '<p class="sig-label">' + rot +
-          '<span class="sig-stamp">Assinado eletronicamente por ' + esc(a.nome) + ' em ' + esc(dataHora(a.em)) +
-          '<br/>Código do documento: ' + esc(a.codigo) + '</span></p>' +
+          (a.empresa ? '' : '<span class="sig-stamp">Assinado eletronicamente por ' + esc(a.nome) + ' em ' + esc(dataHora(a.em)) +
+          '<br/>Código do documento: ' + esc(a.codigo) + '</span>') + '</p>' +
+        (a.empresa ? carimbo(a) : '') +
         '</div>';
     },
 
@@ -235,6 +261,7 @@
           img: mina.img,
           nome: mina.nome || (GSJ.user && (GSJ.user.nome || GSJ.user.username)) || "GSJ",
           rotulo: (cfg.rotulo && cfg.rotulo()) || [],
+          empresa: { razao: (cfg.razao && cfg.razao()) || RAZAO, cnpj: (cfg.cnpj && cfg.cnpj()) || "" },
           em: new Date().toISOString(),
           hash: h, codigo: codigoDe(h)
         };
