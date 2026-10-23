@@ -272,6 +272,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./auth.js"></script>
 <script src="./wpp.js"></script>
+<script src="./assinatura.js"></script>
 <script>window.GSJ && window.GSJ.boot({ page: "contrato" });</script>
 </head>
 <body>
@@ -718,6 +719,16 @@
     ref: function () { return state.orcamentoRef; }
   });
 
+  // Assinar: aplica a assinatura da GSJ no documento e já abre o envio pelo WhatsApp — ver assinatura.js
+  if (window.GSJ && GSJ.sign) GSJ.sign.attach({
+    doc: "Contrato", key: "contrato",
+    getState: function () { return state; },
+    render: function () { updatePreview(); },
+    save: function () { safeSave(); },
+    rotulo: function () { return [state.empresaNome || "Contratada", "Contratada"]; },
+    ref: function () { return state.orcamentoRef; }
+  });
+
   var sheet = document.getElementById("sheet");
 
   function clause(label, text) {
@@ -726,6 +737,7 @@
   }
 
   function updatePreview() {
+    if (window.GSJ && GSJ.sign) GSJ.sign.check(state, safeSave);
     var medHtml =
       '<div class="meas-grid">' +
         '<div class="meas-cell"><div class="lbl">Largura</div><div class="val">' + esc(state.medLargura || "—") + '</div></div>' +
@@ -801,8 +813,11 @@
       '<div class="sheet-clause"><p>' + esc(imagemTexto) + '</p></div>' +
 
       '<div class="sheet-signature">' +
-        '<div class="sig-col"><div class="sig-line"></div><p class="sig-label">' + esc(state.clienteNome || "Contratante") + '<br/>Contratante</p></div>' +
-        '<div class="sig-col"><div class="sig-line"></div><p class="sig-label">' + esc(state.empresaNome || "Contratada") + '<br/>Contratada</p></div>' +
+        '<div class="sig-col">' + (window.GSJ && GSJ.sign ? GSJ.sign.spacer(state) : "") + '<div class="sig-line"></div><p class="sig-label">' + esc(state.clienteNome || "Contratante") + '<br/>Contratante</p></div>' +
+        (function () {
+          var orig = '<div class="sig-col"><div class="sig-line"></div><p class="sig-label">' + esc(state.empresaNome || "Contratada") + '<br/>Contratada</p></div>';
+          return window.GSJ && GSJ.sign ? GSJ.sign.col(state, orig) : orig;
+        })() +
       '</div>' +
       '<div class="sheet-footer">' +
         (state.local ? esc(state.local) + ', ' : '') + (state.dataContrato ? fmtDateBR(state.dataContrato) : fmtDateToday()) +

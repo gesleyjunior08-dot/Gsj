@@ -7,7 +7,7 @@
 // Pra publicar uma atualização: troque o número da versão abaixo
 // (CACHE_VERSION) sempre que mudar algum arquivo. Sem isso, quem já
 // instalou o app pode continuar vendo a versão antiga por um tempo.
-const CACHE_VERSION = "v10";
+const CACHE_VERSION = "v11";
 const CACHE_NAME = "gsj-app-" + CACHE_VERSION;
 
 const PRECACHE_URLS = [
@@ -26,6 +26,7 @@ const PRECACHE_URLS = [
   "./shell.css",
   "./auth.js",
   "./wpp.js",
+  "./assinatura.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-maskable-512.png"

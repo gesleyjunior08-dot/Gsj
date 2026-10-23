@@ -200,6 +200,9 @@
       function msg(texto, erro) { box.hidden = !texto; box.className = "wpp-box" + (erro ? " err" : ""); box.textContent = texto || ""; }
       function descartarPronto() { if (pronto) { pronto = null; setRotulo("Enviar no WhatsApp"); } }
       document.addEventListener("input", descartarPronto, true);
+      // usados pelo botão "Assinar": descarta PDF antigo e dispara o envio
+      GSJ.wpp.reset = descartarPronto;
+      GSJ.wpp.run = function () { descartarPronto(); if (!btn.disabled) btn.click(); };
 
       function textoMensagem() {
         var nome = cfg.saudacao === false ? "" : primeiroNome(cfg.cliente && cfg.cliente());

@@ -398,6 +398,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./auth.js"></script>
 <script src="./wpp.js"></script>
+<script src="./assinatura.js"></script>
 <script>window.GSJ && window.GSJ.boot({ page: "orcamento" });</script>
 </head>
 <body>
@@ -1479,6 +1480,16 @@
     ref: function () { return state.orcamentoId; }
   });
 
+  // Assinar: aplica a assinatura da GSJ no documento e já abre o envio pelo WhatsApp — ver assinatura.js
+  if (window.GSJ && GSJ.sign) GSJ.sign.attach({
+    doc: "Orçamento", key: "orcamento",
+    getState: function () { return state; },
+    render: function () { updatePreview(); },
+    save: function () { safeSave(); },
+    rotulo: function () { return [(state.companyName || "GSJ") + " — " + (state.companyTag || "")]; },
+    ref: function () { return state.orcamentoId; }
+  });
+
   var sheet = document.getElementById("sheet");
 
   function computeCalc() {
@@ -1560,6 +1571,7 @@
   }
 
   function updatePreview() {
+    if (window.GSJ && GSJ.sign) GSJ.sign.check(state, safeSave);
     var calc = computeCalc();
     var rawOriginalSum = state.items.reduce(function (s, it) { return s + (Number(it.value) || 0); }, 0);
 
@@ -1697,8 +1709,8 @@
           '</div>'
         : '') +
       '<div class="sheet-signature">' +
-        '<div class="sig-col"><div class="sig-line"></div><p class="sig-label">Assinatura do cliente — de acordo com este orçamento<br/>Data: ____/____/______</p></div>' +
-        '<div class="sig-col"><div class="sig-line"></div><p class="sig-label">' + esc(state.companyName) + ' — ' + esc(state.companyTag) + '</p></div>' +
+        '<div class="sig-col">' + (window.GSJ && GSJ.sign ? GSJ.sign.spacer(state) : "") + '<div class="sig-line"></div><p class="sig-label">Assinatura do cliente — de acordo com este orçamento<br/>Data: ____/____/______</p></div>' +
+        (window.GSJ && GSJ.sign ? GSJ.sign.col(state, '<div class="sig-col"><div class="sig-line"></div><p class="sig-label">' + esc(state.companyName) + ' — ' + esc(state.companyTag) + '</p></div>') : '<div class="sig-col"><div class="sig-line"></div><p class="sig-label">' + esc(state.companyName) + ' — ' + esc(state.companyTag) + '</p></div>') +
       '</div>' +
       '<div class="sheet-footer">' +
         esc(state.companyName) + ' — ' + esc(state.companyTag) + ' &nbsp;|&nbsp; Tel./WhatsApp ' + esc(state.companyPhone) + '<br/>' +
