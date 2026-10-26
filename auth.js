@@ -71,6 +71,7 @@
 
   var NAV_ITEMS = [
     { key: "inicio", href: "./index.html", label: "Início", icon: "🏠" },
+    { key: "painel", href: "./painel.html", label: "Painel comercial", icon: "📊" },
     { key: "orcamento", href: "./orcamento.html", label: "Orçamento", icon: "📋" },
     { key: "contrato", href: "./contrato.html", label: "Contrato", icon: "📄" },
     { key: "recibo", href: "./recibo.html", label: "Recibo", icon: "🧾" },

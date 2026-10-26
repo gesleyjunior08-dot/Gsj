@@ -1,0 +1,429 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Painel comercial · GSJ</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#954f14">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GSJ">
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Source+Sans+3:wght@400;500;600;700&display=swap");
+  html { color-scheme: light dark; }
+  body { margin: 0; }
+  :root {
+    --bg: #faf6ef; --surface: #ffffff; --surface-2: #fffdf9;
+    --text: #2b2118; --text-muted: #6b5d4f;
+    --accent: #954f14; --accent-2: #c9832e; --accent-soft: #f4e9da;
+    --line: #e3d9c8; --danger: #a6402f; --danger-soft: #f4e1dc;
+    --ok: #3d7a3a; --ok-soft: #e5f1e2;
+    --shadow: 0 1px 2px rgba(43, 33, 24, 0.05), 0 12px 32px rgba(43, 33, 24, 0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
+      --text: #efe7da; --text-muted: #b3a591;
+      --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
+      --line: #3c3226; --danger: #d97d68; --danger-soft: #3a241f;
+      --ok: #8cc684; --ok-soft: #22301f;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1c1712; --surface: #241d17; --surface-2: #2b2319;
+    --text: #efe7da; --text-muted: #b3a591;
+    --accent: #dd9752; --accent-2: #e8a866; --accent-soft: #3a2c1e;
+    --line: #3c3226; --danger: #d97d68; --danger-soft: #3a241f;
+    --ok: #8cc684; --ok-soft: #22301f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 32px 20px 60px; }
+  h1, h2 { font-family: "Newsreader", ui-serif, Georgia, serif; }
+  h1 { font-weight: 700; font-size: clamp(26px, 5vw, 34px); margin: 0 0 6px; }
+  h2 { font-size: 19px; margin: 0 0 12px; }
+  .tagline { color: var(--text-muted); font-size: 15px; margin: 0 0 20px; max-width: 60ch; }
+
+  .btn { display: inline-flex; align-items: center; gap: 6px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--text); font: inherit; font-weight: 600; font-size: 14px;
+    padding: 9px 14px; cursor: pointer; white-space: nowrap; }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-sm { padding: 5px 10px; font-size: 13px; }
+  .btn-danger { color: var(--danger); }
+
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  select, input, textarea { font: inherit; color: var(--text); background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 10px; padding: 9px 11px; width: 100%; }
+  .toolbar select { width: auto; }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 22px; }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; box-shadow: var(--shadow); }
+  .kpi .lbl { font-size: 13px; color: var(--text-muted); }
+  .kpi .num { font-family: "Newsreader", ui-serif, Georgia, serif; font-weight: 700; font-size: 26px; line-height: 1.15; margin-top: 4px; }
+  .kpi .sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); margin-bottom: 18px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .chart svg { width: 100%; height: auto; display: block; }
+  .chart .bar { fill: var(--accent-2); }
+  .chart .bar.cur { fill: var(--accent); }
+  .chart text { fill: var(--text-muted); font-size: 11px; font-family: inherit; }
+  .chart .val { fill: var(--text); font-weight: 600; }
+  .chart .base { stroke: var(--line); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+  td.r, th.r { text-align: right; white-space: nowrap; }
+  .table-scroll { overflow-x: auto; }
+  .pill { display: inline-block; border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 600; }
+  .pill.Fechado { background: var(--ok-soft); color: var(--ok); }
+  .pill.Perdido { background: var(--danger-soft); color: var(--danger); }
+  .pill.aberto { background: var(--accent-soft); color: var(--accent); }
+  .muted { color: var(--text-muted); }
+  .empty { color: var(--text-muted); font-size: 14px; padding: 8px 0; }
+  .notice { background: var(--danger-soft); color: var(--danger); border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; font-size: 14px; }
+
+  dialog { border: 1px solid var(--line); border-radius: 18px; padding: 0; background: var(--surface); color: var(--text);
+    width: min(560px, calc(100vw - 24px)); box-shadow: var(--shadow); }
+  dialog::backdrop { background: rgba(20, 14, 8, .45); }
+  .dlg-body { padding: 20px; max-height: 80vh; overflow-y: auto; }
+  .form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form .full { grid-column: 1 / -1; }
+  .form label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--text-muted); }
+  .dlg-actions { display: flex; justify-content: space-between; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--line); }
+  @media (max-width: 520px) { .form { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="app" id="gsjPageRoot">
+  <div class="wrap">
+    <h1>Painel comercial</h1>
+    <p class="tagline">Vendas, orçamentos e de onde vêm os clientes. Cadastre cada orçamento enviado e atualize quando fechar ou perder.</p>
+
+    <div class="notice" id="setupNotice" hidden></div>
+
+    <div class="toolbar">
+      <select id="periodo" aria-label="Período">
+        <option value="1">Este mês</option>
+        <option value="3">Últimos 3 meses</option>
+        <option value="6">Últimos 6 meses</option>
+        <option value="12" selected>Últimos 12 meses</option>
+        <option value="0">Tudo</option>
+      </select>
+      <button class="btn btn-primary" id="btnNova" type="button">+ Nova venda / orçamento</button>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="lbl">Faturamento (fechados)</div><div class="num" id="kFat">—</div><div class="sub" id="kFatSub"></div></div>
+      <div class="kpi"><div class="lbl">Orçamentos enviados</div><div class="num" id="kOrc">—</div><div class="sub" id="kOrcSub"></div></div>
+      <div class="kpi"><div class="lbl">Taxa de fechamento</div><div class="num" id="kTaxa">—</div><div class="sub">fechados ÷ decididos</div></div>
+      <div class="kpi"><div class="lbl">Ticket médio</div><div class="num" id="kTicket">—</div><div class="sub">por contrato fechado</div></div>
+      <div class="kpi"><div class="lbl">Margem média</div><div class="num" id="kMargem">—</div><div class="sub" id="kMargemSub">dos fechados com custo</div></div>
+    </div>
+
+    <div class="card chart">
+      <h2>Faturamento por mês</h2>
+      <div id="chart"><p class="empty">Carregando…</p></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>Origem dos clientes</h2>
+        <div class="table-scroll" id="tOrigem"></div>
+      </div>
+      <div class="card">
+        <h2>Por tipo de móvel</h2>
+        <div class="table-scroll" id="tTipo"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar" style="margin-bottom:10px">
+        <h2 style="margin:0">Vendas e orçamentos</h2>
+        <select id="filtroStatus" aria-label="Filtrar status">
+          <option value="">Todos</option>
+          <option>Em aberto</option>
+          <option>Fechado</option>
+          <option>Perdido</option>
+        </select>
+      </div>
+      <div class="table-scroll" id="tLista"><p class="empty">Carregando…</p></div>
+    </div>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <form method="dialog" id="frm">
+    <div class="dlg-body">
+      <h2 id="dlgTitle">Nova venda</h2>
+      <div class="form">
+        <div class="full">
+          <label for="fOrc">Puxar de um orçamento salvo (opcional)</label>
+          <select id="fOrc"><option value="">— digitar à mão —</option></select>
+        </div>
+        <div><label for="fData">Data do orçamento</label><input id="fData" type="date" required></div>
+        <div><label for="fStatus">Status</label>
+          <select id="fStatus"><option>Em aberto</option><option>Fechado</option><option>Perdido</option></select></div>
+        <div class="full"><label for="fCliente">Cliente</label><input id="fCliente" required></div>
+        <div><label for="fTipo">Tipo de móvel</label><input id="fTipo" list="tiposList" placeholder="Cozinha, closet…"></div>
+        <div><label for="fOrigem">Como chegou</label>
+          <select id="fOrigem">
+            <option>Indicação</option><option>Arquiteto</option><option>Instagram</option>
+            <option>Cliente antigo</option><option>Google</option><option>Outro</option>
+          </select></div>
+        <div><label for="fValor">Valor (R$)</label><input id="fValor" type="number" step="0.01" min="0" required></div>
+        <div><label for="fCusto">Custo (R$) — p/ margem</label><input id="fCusto" type="number" step="0.01" min="0" placeholder="material + mão de obra + frete"></div>
+        <div><label for="fArq">Arquiteto parceiro</label><input id="fArq" list="arqList"></div>
+        <div><label for="fFech">Data de fechamento</label><input id="fFech" type="date"></div>
+        <div class="full"><label for="fObs">Observações</label><textarea id="fObs" rows="2"></textarea></div>
+      </div>
+      <datalist id="tiposList">
+        <option>Cozinha</option><option>Closet</option><option>Quarto</option><option>Banheiro</option>
+        <option>Sala / painel</option><option>Escritório</option><option>Área gourmet</option><option>Comercial</option>
+      </datalist>
+      <datalist id="arqList"></datalist>
+    </div>
+    <div class="dlg-actions">
+      <button class="btn btn-danger" id="btnDel" type="button" hidden>Excluir</button>
+      <span style="flex:1"></span>
+      <button class="btn" value="cancel" type="submit" formnovalidate>Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvar" type="button">Salvar</button>
+    </div>
+  </form>
+</dialog>
+
+<link rel="stylesheet" href="./shell.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./auth.js"></script>
+<script>
+(function () {
+  var rows = [];          // gsj_vendas
+  var orcs = [];          // gsj_orcamentos (pra puxar dados)
+  var editingId = null;
+  var $ = function (id) { return document.getElementById(id); };
+  var MESES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+
+  function esc(s) { return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function brl(v) { return (Number(v) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }); }
+  function brlK(v) { v = Number(v) || 0; return v >= 1000 ? "R$" + (v / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + "k" : "R$" + Math.round(v); }
+  function pct(v) { return v == null || isNaN(v) ? "—" : Math.round(v * 100) + "%"; }
+  function today() { var d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); }
+  function ym(dateStr) { return String(dateStr || "").slice(0, 7); }
+  function fmtData(s) { if (!s) return ""; var p = s.split("-"); return p[2] + "/" + p[1] + "/" + p[0].slice(2); }
+  function dataFech(r) { return r.data_fechamento || r.data; }
+
+  // primeiro mês (YYYY-MM) do período escolhido; null = tudo
+  function inicioPeriodo() {
+    var n = Number($("periodo").value);
+    if (!n) return null;
+    var d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - (n - 1));
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+  }
+
+  function render() {
+    var ini = inicioPeriodo();
+    var noPeriodo = function (s) { return !ini || ym(s) >= ini; };
+    var orcPer = rows.filter(function (r) { return noPeriodo(r.data); });
+    var fechPer = rows.filter(function (r) { return r.status === "Fechado" && noPeriodo(dataFech(r)); });
+
+    var fat = fechPer.reduce(function (a, r) { return a + Number(r.valor || 0); }, 0);
+    $("kFat").textContent = brl(fat);
+    $("kFatSub").textContent = fechPer.length + (fechPer.length === 1 ? " contrato" : " contratos");
+    $("kOrc").textContent = orcPer.length;
+    var abertos = orcPer.filter(function (r) { return r.status === "Em aberto"; }).length;
+    $("kOrcSub").textContent = abertos + " em aberto";
+    var decididos = orcPer.filter(function (r) { return r.status !== "Em aberto"; });
+    var fechDec = decididos.filter(function (r) { return r.status === "Fechado"; }).length;
+    $("kTaxa").textContent = decididos.length ? pct(fechDec / decididos.length) : "—";
+    $("kTicket").textContent = fechPer.length ? brl(fat / fechPer.length) : "—";
+    var comCusto = fechPer.filter(function (r) { return r.custo != null && Number(r.valor) > 0; });
+    if (comCusto.length) {
+      var v = comCusto.reduce(function (a, r) { return a + Number(r.valor); }, 0);
+      var c = comCusto.reduce(function (a, r) { return a + Number(r.custo); }, 0);
+      $("kMargem").textContent = pct((v - c) / v);
+      $("kMargemSub").textContent = comCusto.length + " de " + fechPer.length + " com custo informado";
+    } else { $("kMargem").textContent = "—"; $("kMargemSub").textContent = "informe o custo dos fechados"; }
+
+    renderChart();
+    renderGroup("tOrigem", orcPer, function (r) { return r.origem || "Outro"; }, "Origem");
+    renderGroup("tTipo", orcPer, function (r) { return r.tipo_movel || "Não informado"; }, "Tipo");
+    renderLista();
+  }
+
+  // faturamento dos últimos 12 meses (sempre 12, pra ver a tendência)
+  function renderChart() {
+    var meses = [], d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - 11);
+    for (var i = 0; i < 12; i++) {
+      meses.push({ k: d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"), lbl: MESES[d.getMonth()], v: 0 });
+      d.setMonth(d.getMonth() + 1);
+    }
+    rows.forEach(function (r) {
+      if (r.status !== "Fechado") return;
+      var m = meses.find(function (x) { return x.k === ym(dataFech(r)); });
+      if (m) m.v += Number(r.valor || 0);
+    });
+    var max = Math.max.apply(null, meses.map(function (m) { return m.v; }));
+    if (!max) { $("chart").innerHTML = '<p class="empty">Ainda não há vendas fechadas nos últimos 12 meses.</p>'; return; }
+    var W = 720, H = 220, top = 22, bottom = 26, gap = 10, bw = (W - gap * 11) / 12, ch = H - top - bottom;
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Faturamento por mês">';
+    meses.forEach(function (m, i) {
+      var h = m.v ? Math.max(2, m.v / max * ch) : 0, x = i * (bw + gap), y = top + ch - h;
+      svg += '<rect class="bar' + (i === 11 ? " cur" : "") + '" x="' + x + '" y="' + y + '" width="' + bw + '" height="' + h + '" rx="4"><title>' + m.lbl + ': ' + brl(m.v) + '</title></rect>';
+      if (m.v) svg += '<text class="val" x="' + (x + bw / 2) + '" y="' + (y - 6) + '" text-anchor="middle">' + brlK(m.v) + '</text>';
+      svg += '<text x="' + (x + bw / 2) + '" y="' + (H - 8) + '" text-anchor="middle">' + m.lbl + '</text>';
+    });
+    svg += '<line class="base" x1="0" x2="' + W + '" y1="' + (top + ch) + '" y2="' + (top + ch) + '"/></svg>';
+    $("chart").innerHTML = svg;
+  }
+
+  function renderGroup(elId, list, keyFn, titulo) {
+    if (!list.length) { $(elId).innerHTML = '<p class="empty">Sem dados no período.</p>'; return; }
+    var g = {};
+    list.forEach(function (r) {
+      var k = keyFn(r); g[k] = g[k] || { n: 0, f: 0, v: 0 };
+      g[k].n++; if (r.status === "Fechado") { g[k].f++; g[k].v += Number(r.valor || 0); }
+    });
+    var ks = Object.keys(g).sort(function (a, b) { return g[b].v - g[a].v || g[b].n - g[a].n; });
+    var h = '<table><thead><tr><th>' + titulo + '</th><th class="r">Orçam.</th><th class="r">Fech.</th><th class="r">Faturado</th></tr></thead><tbody>';
+    ks.forEach(function (k) { h += '<tr><td>' + esc(k) + '</td><td class="r">' + g[k].n + '</td><td class="r">' + g[k].f + '</td><td class="r">' + brl(g[k].v) + '</td></tr>'; });
+    $(elId).innerHTML = h + '</tbody></table>';
+  }
+
+  function renderLista() {
+    var st = $("filtroStatus").value;
+    var list = rows.filter(function (r) { return !st || r.status === st; });
+    if (!list.length) { $("tLista").innerHTML = '<p class="empty">Nada cadastrado ainda. Clique em “+ Nova venda / orçamento”.</p>'; return; }
+    var h = '<table><thead><tr><th>Data</th><th>Cliente</th><th>Tipo</th><th>Origem</th><th class="r">Valor</th><th>Status</th><th></th></tr></thead><tbody>';
+    list.forEach(function (r) {
+      var cls = r.status === "Em aberto" ? "aberto" : r.status;
+      h += '<tr><td>' + fmtData(r.data) + '</td><td>' + esc(r.cliente) + '</td><td>' + esc(r.tipo_movel || "") + '</td>' +
+        '<td>' + esc(r.origem || "") + (r.arquiteto ? '<div class="muted" style="font-size:12px">' + esc(r.arquiteto) + '</div>' : '') + '</td>' +
+        '<td class="r">' + brl(r.valor) + '</td><td><span class="pill ' + cls + '">' + esc(r.status) + '</span></td>' +
+        '<td class="r"><button class="btn btn-sm" data-edit="' + r.id + '" type="button">Editar</button></td></tr>';
+    });
+    $("tLista").innerHTML = h + '</tbody></table>';
+  }
+
+  function fillArquitetos() {
+    var set = {};
+    rows.forEach(function (r) { if (r.arquiteto) set[r.arquiteto] = 1; });
+    $("arqList").innerHTML = Object.keys(set).sort().map(function (a) { return '<option value="' + esc(a) + '">'; }).join("");
+  }
+
+  function openForm(r) {
+    editingId = r ? r.id : null;
+    $("dlgTitle").textContent = r ? "Editar venda" : "Nova venda / orçamento";
+    $("btnDel").hidden = !r;
+    $("fOrc").value = r && r.orcamento_id ? String(r.orcamento_id) : "";
+    $("fData").value = r ? r.data : today();
+    $("fStatus").value = r ? r.status : "Em aberto";
+    $("fCliente").value = r ? r.cliente : "";
+    $("fTipo").value = r ? (r.tipo_movel || "") : "";
+    $("fOrigem").value = r ? (r.origem || "Indicação") : "Indicação";
+    $("fValor").value = r ? r.valor : "";
+    $("fCusto").value = r && r.custo != null ? r.custo : "";
+    $("fArq").value = r ? (r.arquiteto || "") : "";
+    $("fFech").value = r ? (r.data_fechamento || "") : "";
+    $("fObs").value = r ? (r.obs || "") : "";
+    $("dlg").showModal();
+  }
+
+  function load() {
+    return GSJ.sb.from("gsj_vendas").select("*").order("data", { ascending: false }).order("id", { ascending: false })
+      .then(function (res) {
+        if (res.error) {
+          var n = $("setupNotice"); n.hidden = false;
+          n.textContent = /gsj_vendas|42P01|PGRST205/.test(JSON.stringify(res.error))
+            ? "O painel ainda não está ativado no banco. Rode o arquivo sql/painel-comercial.sql no SQL Editor do Supabase (uma vez só) e recarregue."
+            : "Não consegui carregar os dados: " + (res.error.message || "erro desconhecido");
+          $("tLista").innerHTML = ""; $("chart").innerHTML = "";
+          return;
+        }
+        rows = res.data || [];
+        fillArquitetos();
+        render();
+      });
+  }
+
+  function loadOrcs() {
+    GSJ.sb.from("gsj_orcamentos").select("id, numero, cliente, total, updated_at").order("updated_at", { ascending: false }).limit(200)
+      .then(function (res) {
+        if (res.error) return;
+        orcs = res.data || [];
+        $("fOrc").innerHTML = '<option value="">— digitar à mão —</option>' + orcs.map(function (o) {
+          return '<option value="' + o.id + '">' + esc((o.numero ? o.numero + " · " : "") + (o.cliente || "Sem nome") + " · " + brl(o.total)) + '</option>';
+        }).join("");
+      });
+  }
+
+  $("fOrc").addEventListener("change", function () {
+    var o = orcs.find(function (x) { return String(x.id) === this.value; }, this);
+    if (!o) return;
+    if (o.cliente) $("fCliente").value = o.cliente;
+    if (o.total != null) $("fValor").value = Number(o.total).toFixed(2);
+    if (o.updated_at && !editingId) $("fData").value = String(o.updated_at).slice(0, 10);
+  });
+
+  $("fStatus").addEventListener("change", function () {
+    if (this.value === "Fechado" && !$("fFech").value) $("fFech").value = today();
+  });
+
+  $("btnSalvar").addEventListener("click", function () {
+    if (!$("fCliente").value.trim() || $("fValor").value === "" || !$("fData").value) {
+      alert("Preencha pelo menos data, cliente e valor."); return;
+    }
+    var status = $("fStatus").value;
+    var payload = {
+      data: $("fData").value,
+      cliente: $("fCliente").value.trim(),
+      tipo_movel: $("fTipo").value.trim() || null,
+      origem: $("fOrigem").value,
+      arquiteto: $("fArq").value.trim() || null,
+      valor: Number($("fValor").value) || 0,
+      custo: $("fCusto").value === "" ? null : Number($("fCusto").value),
+      status: status,
+      data_fechamento: status === "Fechado" ? ($("fFech").value || today()) : null,
+      orcamento_id: $("fOrc").value ? Number($("fOrc").value) : null,
+      obs: $("fObs").value.trim() || null
+    };
+    var btn = this; btn.disabled = true; btn.textContent = "Salvando…";
+    var q = editingId ? GSJ.sb.from("gsj_vendas").update(payload).eq("id", editingId) : GSJ.sb.from("gsj_vendas").insert(payload);
+    q.then(function (res) {
+      btn.disabled = false; btn.textContent = "Salvar";
+      if (res.error) { alert("Não salvou: " + res.error.message); return; }
+      if (window.GSJ && GSJ.logAction) GSJ.logAction("salvar", "venda", payload.cliente);
+      $("dlg").close(); load();
+    });
+  });
+
+  $("btnDel").addEventListener("click", function () {
+    if (!editingId || !confirm("Excluir este registro? Não dá pra desfazer.")) return;
+    GSJ.sb.from("gsj_vendas").delete().eq("id", editingId).then(function (res) {
+      if (res.error) { alert("Não excluiu: " + res.error.message); return; }
+      $("dlg").close(); load();
+    });
+  });
+
+  $("btnNova").addEventListener("click", function () { openForm(null); });
+  $("periodo").addEventListener("change", render);
+  $("filtroStatus").addEventListener("change", renderLista);
+  $("tLista").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-edit]"); if (!b) return;
+    var r = rows.find(function (x) { return String(x.id) === b.getAttribute("data-edit"); });
+    if (r) openForm(r);
+  });
+
+  GSJ.boot({ page: "painel" }).then(function () {
+    if (!GSJ.sb || !GSJ.user) return;
+    load(); loadOrcs();
+  });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("./sw.js").catch(function () {}); });
+  }
+})();
+</script>
+</body></html>
