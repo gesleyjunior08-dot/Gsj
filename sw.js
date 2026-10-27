@@ -13,7 +13,6 @@ const CACHE_NAME = "gsj-app-" + CACHE_VERSION;
 const PRECACHE_URLS = [
   "./",
   "./index.html",
-  "./painel.html",
   "./orcamento.html",
   "./contrato.html",
   "./recibo.html",

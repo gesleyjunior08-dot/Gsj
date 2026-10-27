@@ -10,8 +10,9 @@
 (function () {
   "use strict";
 
-  var HTML2CANVAS = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
-  var JSPDF = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+  // as bibliotecas ficam no próprio app (lib-*.js na raiz); se não carregarem, tenta o CDN
+  var HTML2CANVAS = ["./lib-html2canvas.min.js", "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"];
+  var JSPDF = ["./lib-jspdf.min.js", "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"];
   var PX_PER_MM = 96 / 25.4;
   var SCALE = 2.5;                       // nitidez do PDF (≈ 240 dpi)
   var FORMATS = { a4: { w: 210, h: 297 }, a5: { w: 148, h: 210 } };
@@ -19,22 +20,31 @@
   var GSJ = (window.GSJ = window.GSJ || {});
 
   // ---------------- utilidades ----------------
-  function loadScript(src) {
+  function loadOne(src) {
     return new Promise(function (resolve, reject) {
       var s = document.createElement("script");
       s.src = src; s.async = true;
       s.onload = function () { resolve(); };
-      s.onerror = function () { reject(new Error("Não consegui carregar a biblioteca de PDF — verifique a internet.")); };
+      s.onerror = function () { s.remove(); reject(new Error("falha ao carregar " + src)); };
       document.head.appendChild(s);
     });
+  }
+  function loadScript(srcs, ok) {          // tenta cada endereço até um funcionar
+    var i = 0;
+    function next() {
+      if (ok()) return Promise.resolve();
+      if (i >= srcs.length) return Promise.reject(new Error("Não consegui carregar a biblioteca de PDF — verifique a internet."));
+      return loadOne(srcs[i++]).then(function () { if (!ok()) return next(); }, next);
+    }
+    return next();
   }
   var libsPromise = null;
   function ensureLibs() {
     if (window.html2canvas && window.jspdf) return Promise.resolve();
     if (!libsPromise) {
       libsPromise = Promise.all([
-        window.html2canvas ? 0 : loadScript(HTML2CANVAS),
-        window.jspdf ? 0 : loadScript(JSPDF)
+        loadScript(HTML2CANVAS, function () { return !!window.html2canvas; }),
+        loadScript(JSPDF, function () { return !!window.jspdf; })
       ]).catch(function (e) { libsPromise = null; throw e; });
     }
     return libsPromise;
@@ -99,16 +109,30 @@
     return cuts;
   }
 
-  function gerarPdf(opts) {
+  // celulares Android (principalmente os mais simples) têm pouca memória para imagens grandes:
+  // limita o tamanho total da imagem e, se mesmo assim falhar, tenta de novo menor
+  var ANDROID = /Android/i.test(navigator.userAgent || "");
+  var MAX_PIXELS = ANDROID ? 9e6 : 22e6;
+  function escolherEscala(wPx, hPx, base) {
+    var s = Math.min(base, Math.sqrt(MAX_PIXELS / Math.max(1, wPx * hPx)), 12000 / Math.max(1, hPx));
+    return Math.max(1.2, Math.round(s * 100) / 100);
+  }
+  function etapa(cb, t) { try { if (cb) cb(t); } catch (e) {} return new Promise(function (r) { setTimeout(r, 30); }); }  // deixa a tela atualizar o texto
+
+  function gerarPdf(opts, onEtapa) {
     var fmt = FORMATS[opts.format] || FORMATS.a4;
     var my = opts.margin[0], mx = opts.margin[1];
     var innerWmm = fmt.w - 2 * mx, innerHmm = fmt.h - 2 * my;
     var innerWpx = Math.round(innerWmm * PX_PER_MM);
     var sheet = document.querySelector(opts.sheet || "#sheet");
     if (!sheet) return Promise.reject(new Error("Não achei o documento na tela."));
+    var diag = { etapa: "início", escala: null, tamanho: null, tentativas: 0 };
+    function falha(e) { var err = e instanceof Error ? e : new Error(String(e)); err.diag = diag; throw err; }
 
-    return ensureLibs()
+    return etapa(onEtapa, "Carregando…")
+      .then(function () { diag.etapa = "bibliotecas"; return ensureLibs(); })
       .then(function () { return (document.fonts && document.fonts.ready) ? document.fonts.ready : null; })
+      .then(function () { diag.etapa = "montar"; return etapa(onEtapa, "Montando documento…"); })
       .then(function () {
         // cópia da folha fora da tela, na largura exata do papel (sem depender do tamanho do celular)
         var holder = document.createElement("div");
@@ -120,46 +144,66 @@
         holder.appendChild(clone);
         document.body.appendChild(holder);
 
-        var base = clone.getBoundingClientRect().top;
+        var base = clone.getBoundingClientRect();
+        var hPx = Math.ceil(base.height);
+        diag.tamanho = innerWpx + "x" + hPx;
+        // blocos em px de tela (sem escala); a escala só é decidida agora, pelo tamanho do documento
         var blocks = Array.prototype.map.call(clone.querySelectorAll(KEEP_SELECTOR), function (el) {
           var r = el.getBoundingClientRect();
-          return { top: (r.top - base) * SCALE, bottom: (r.bottom - base) * SCALE };
+          return { top: r.top - base.top, bottom: r.bottom - base.top };
         });
         Array.prototype.forEach.call(clone.querySelectorAll(TITLE_SELECTOR), function (el) {
           var nx = el.nextElementSibling; if (!nx) return;
           var r = el.getBoundingClientRect(), r2 = nx.getBoundingClientRect();
-          blocks.push({ top: (r.top - base) * SCALE, bottom: (r2.bottom - base) * SCALE });
+          blocks.push({ top: r.top - base.top, bottom: r2.bottom - base.top });
         });
         blocks = blocks.filter(function (b) { return b.bottom - b.top > 4; });
 
-        return window.html2canvas(clone, {
-          scale: SCALE, backgroundColor: "#ffffff", useCORS: true, logging: false,
-          width: innerWpx, windowWidth: innerWpx
-        }).then(function (canvas) {
-          holder.remove();
-          return { canvas: canvas, blocks: blocks };
-        }, function (e) { holder.remove(); throw e; });
+        function renderizar(escala) {
+          diag.escala = escala; diag.tentativas++;
+          return window.html2canvas(clone, {
+            scale: escala, backgroundColor: "#ffffff", useCORS: true, logging: false,
+            width: innerWpx, windowWidth: innerWpx
+          });
+        }
+        var escala = escolherEscala(innerWpx, hPx, SCALE);
+        diag.etapa = "imagem";
+        return etapa(onEtapa, "Gerando imagem…")
+          .then(function () { return renderizar(escala); })
+          .catch(function () {                       // memória/limite do aparelho: tenta de novo menor
+            return etapa(onEtapa, "Tentando de novo…").then(function () { return renderizar(Math.max(1.1, escala * 0.65)); });
+          })
+          .then(function (canvas) { holder.remove(); return { canvas: canvas, blocks: blocks, escala: diag.escala }; },
+                function (e) { holder.remove(); throw e; });
       })
       .then(function (r) {
-        var canvas = r.canvas;
-        var pageInnerH = innerHmm * PX_PER_MM * SCALE;
-        var cuts = calcularCortes(canvas, r.blocks, pageInnerH);
-        var jsPDF = window.jspdf.jsPDF;
-        var pdf = new jsPDF({ unit: "mm", format: [fmt.w, fmt.h], orientation: "portrait", compress: true });
-        for (var i = 0; i < cuts.length - 1; i++) {
-          var y0 = cuts[i], y1 = cuts[i + 1], h = y1 - y0;
-          if (h < 4) continue;
-          var part = document.createElement("canvas");
-          part.width = canvas.width; part.height = h;
-          var pc = part.getContext("2d");
-          pc.fillStyle = "#fff"; pc.fillRect(0, 0, part.width, part.height);
-          pc.drawImage(canvas, 0, y0, canvas.width, h, 0, 0, canvas.width, h);
-          if (i > 0) pdf.addPage([fmt.w, fmt.h], "portrait");
-          pdf.addImage(part.toDataURL("image/jpeg", 0.93), "JPEG", mx, my, innerWmm, h / SCALE / PX_PER_MM, undefined, "FAST");
-        }
-        try { pdf.setProperties({ title: opts.titulo || "Documento GSJ", author: "GSJ Marcenaria & Móveis Planejados" }); } catch (e) {}
-        return { blob: pdf.output("blob"), paginas: pdf.getNumberOfPages() };
-      });
+        diag.etapa = "pdf";
+        return etapa(onEtapa, "Criando PDF…").then(function () {
+          var canvas = r.canvas, esc = r.escala;
+          if (!canvas || !canvas.width || !canvas.height) throw new Error("a imagem do documento saiu vazia");
+          var pageInnerH = innerHmm * PX_PER_MM * esc;
+          var blocosEsc = r.blocks.map(function (b) { return { top: b.top * esc, bottom: b.bottom * esc }; });
+          var cuts = calcularCortes(canvas, blocosEsc, pageInnerH);
+          var jsPDF = window.jspdf.jsPDF;
+          var pdf = new jsPDF({ unit: "mm", format: [fmt.w, fmt.h], orientation: "portrait", compress: true });
+          for (var i = 0; i < cuts.length - 1; i++) {
+            var y0 = cuts[i], y1 = cuts[i + 1], h = y1 - y0;
+            if (h < 4) continue;
+            var part = document.createElement("canvas");
+            part.width = canvas.width; part.height = h;
+            var pc = part.getContext("2d");
+            pc.fillStyle = "#fff"; pc.fillRect(0, 0, part.width, part.height);
+            pc.drawImage(canvas, 0, y0, canvas.width, h, 0, 0, canvas.width, h);
+            if (i > 0) pdf.addPage([fmt.w, fmt.h], "portrait");
+            pdf.addImage(part.toDataURL("image/jpeg", 0.92), "JPEG", mx, my, innerWmm, h / esc / PX_PER_MM, undefined, "FAST");
+            part.width = part.height = 0;            // libera memória
+          }
+          canvas.width = canvas.height = 0;
+          try { pdf.setProperties({ title: opts.titulo || "Documento GSJ", author: "GSJ Marcenaria & Móveis Planejados" }); } catch (e) {}
+          return { blob: pdf.output("blob"), paginas: pdf.getNumberOfPages() };
+        });
+      })
+      .catch(falha);
   }
 
   // ---------------- botão + fluxo de envio ----------------
@@ -232,6 +276,10 @@
         b.addEventListener("click", function () { baixar(file); });
         box.appendChild(p); box.appendChild(a); box.appendChild(b);
       }
+      function aguardarToque(file) {      // o navegador só deixa compartilhar logo depois de um toque
+        pronto = file; setRotulo("Toque para enviar o PDF");
+        msg("PDF pronto. Toque no botão verde de novo para escolher o WhatsApp.");
+      }
       function compartilhar(file) {
         var dados = { files: [file], title: file.name, text: textoMensagem() };
         return navigator.share(dados).then(function () {
@@ -239,14 +287,16 @@
           return true;
         }, function (e) {
           if (e && e.name === "AbortError") { msg(""); return true; }          // fechou a lista, sem erro
-          if (e && e.name === "NotAllowedError") {                                // passou muito tempo desde o toque
-            pronto = file; setRotulo("Toque para enviar o PDF");
-            msg("PDF pronto. Toque no botão verde de novo para escolher o WhatsApp.");
+          if (e && (e.name === "NotAllowedError" || e.name === "SecurityError")) {   // passou muito tempo desde o toque
+            aguardarToque(file);
             return true;
           }
           return false;
         });
       }
+
+      // baixa as bibliotecas de PDF em segundo plano, para o primeiro envio não esperar a internet
+      (window.requestIdleCallback || function (f) { setTimeout(f, 3500); })(function () { ensureLibs().catch(function () {}); });
 
       btn.addEventListener("click", function () {
         if (btn.disabled) return;
@@ -259,16 +309,23 @@
         var cli = cfg.cliente && cfg.cliente();
         var ref = cfg.ref && cfg.ref();
         var nome = nomeArquivo(cfg.doc, cli, ref);
-        gerarPdf({ sheet: cfg.sheet, format: cfg.format, margin: cfg.margin, titulo: nome.replace(/\.pdf$/, "") })
+        var limite = new Promise(function (_, rej) { setTimeout(function () { var e = new Error("demorou demais para montar o PDF"); e.diag = { etapa: "tempo" }; rej(e); }, 150000); });
+        Promise.race([gerarPdf({ sheet: cfg.sheet, format: cfg.format, margin: cfg.margin, titulo: nome.replace(/\.pdf$/, "") }, setRotulo), limite])
           .then(function (r) {
             var file = new File([r.blob], nome, { type: "application/pdf" });
             if (window.GSJ && GSJ.logAction) GSJ.logAction("whatsapp", cfg.key || null, (ref || cli || null));
             var pode = false;
             try { pode = !!(navigator.canShare && navigator.share && navigator.canShare({ files: [file] })); } catch (e) {}
+            // celulares mais lentos demoram para montar o PDF e o toque "vence": pede um novo toque em vez de falhar
+            if (pode && navigator.userActivation && !navigator.userActivation.isActive) { aguardarToque(file); return; }
             if (pode) return compartilhar(file).then(function (ok) { if (!ok) { baixar(file); mostrarFallback(file); } });
             baixar(file); mostrarFallback(file);
           })
-          .catch(function (e) { msg("Não deu pra gerar o PDF: " + (e && e.message ? e.message : "erro inesperado"), true); })
+          .catch(function (e) {
+            var d = e && e.diag ? e.diag : {};
+            msg("Não deu pra gerar o PDF: " + (e && e.message ? e.message : "erro inesperado") +
+              ". Toque no botão para tentar de novo. [etapa: " + (d.etapa || "?") + (d.escala ? ", escala " + d.escala : "") + (d.tamanho ? ", " + d.tamanho : "") + "]", true);
+          })
           .then(function () { btn.disabled = false; if (!pronto) setRotulo("Enviar no WhatsApp"); });
       });
     }
