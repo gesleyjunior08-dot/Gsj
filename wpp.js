@@ -239,10 +239,12 @@
       box.className = "wpp-box"; box.id = "wppBox"; box.hidden = true; box.setAttribute("role", "status");
       btn.insertAdjacentElement("afterend", box);
 
+      var VERSAO = "v15";
       var pronto = null;           // PDF já gerado (quando o celular exige um novo toque pra compartilhar)
+      var ultimo = null;           // último PDF gerado (painel de envio)
       function setRotulo(t) { btn.querySelector("span").textContent = t; }
       function msg(texto, erro) { box.hidden = !texto; box.className = "wpp-box" + (erro ? " err" : ""); box.textContent = texto || ""; }
-      function descartarPronto() { if (pronto) { pronto = null; setRotulo("Enviar no WhatsApp"); } }
+      function descartarPronto() { if (pronto) { pronto = null; } ultimo = null; setRotulo("Enviar no WhatsApp"); }
       document.addEventListener("input", descartarPronto, true);
       // usados pelo botão "Assinar": descarta PDF antigo e dispara o envio
       GSJ.wpp.reset = descartarPronto;
@@ -264,33 +266,81 @@
         a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
       }
-      function mostrarFallback(file) {
-        box.hidden = false; box.className = "wpp-box"; box.textContent = "";
-        var p = document.createElement("div");
-        p.textContent = "PDF baixado (" + file.name + "). No WhatsApp, toque no clipe 📎, escolha Documento e selecione esse arquivo.";
-        var a = document.createElement("a");
-        a.className = "btn btn-primary"; a.href = linkWa(); a.target = "_blank"; a.rel = "noopener";
-        a.textContent = "Abrir WhatsApp ↗";
-        var b = document.createElement("button");
-        b.type = "button"; b.className = "btn"; b.textContent = "Baixar de novo";
-        b.addEventListener("click", function () { baixar(file); });
-        box.appendChild(p); box.appendChild(a); box.appendChild(b);
+      function podeCompartilhar(file) {
+        try { return !!(navigator.canShare && navigator.share && navigator.canShare({ files: [file] })); } catch (e) { return false; }
       }
+      function motivo(e) { return e ? ((e.name || "Erro") + (e.message ? " – " + e.message : "")) : "sem detalhe"; }
+
+      // Painel que fica sempre na tela depois que o PDF é gerado: nunca deixa o toque "sem resposta".
+      function painel(file, aviso, detalhe, erro) {
+        ultimo = file;
+        box.hidden = false; box.className = "wpp-box" + (erro ? " err" : ""); box.textContent = "";
+        var p = document.createElement("div");
+        p.textContent = aviso;
+        box.appendChild(p);
+        if (detalhe) {
+          var d = document.createElement("div");
+          d.style.cssText = "font-size:11px;opacity:.75;margin-top:4px";
+          d.textContent = detalhe;
+          box.appendChild(d);
+        }
+        if (podeCompartilhar(file)) {
+          var s = document.createElement("button");
+          s.type = "button"; s.className = "btn btn-primary"; s.textContent = "Compartilhar PDF";
+          s.addEventListener("click", function () {
+            // novo toque = permissão nova do navegador; manda só o arquivo (sem texto/título) pra ser o mais compatível
+            var t0 = Date.now();
+            navigator.share({ files: [file] }).then(function () {
+              painel(file, "Pronto — escolha o contato no WhatsApp para enviar.");
+            }, function (e) {
+              if (e && e.name === "AbortError" && Date.now() - t0 > 700) return;   // fechou a lista de propósito
+              painel(file, "O celular não abriu a lista de compartilhamento. Use as opções abaixo.", "Motivo: " + motivo(e), true);
+            });
+          });
+          box.appendChild(s);
+        }
+        var a = document.createElement("a");
+        a.className = "btn" + (podeCompartilhar(file) ? "" : " btn-primary"); a.href = linkWa(); a.target = "_blank"; a.rel = "noopener";
+        a.textContent = "Abrir WhatsApp ↗";
+        box.appendChild(a);
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "btn"; b.textContent = "Baixar PDF";
+        b.addEventListener("click", function () {
+          baixar(file);
+          var q = box.querySelector(".wpp-baixou");
+          if (!q) { q = document.createElement("div"); q.className = "wpp-baixou"; q.style.cssText = "font-size:12px;margin-top:6px"; box.appendChild(q); }
+          q.textContent = "Baixado (" + file.name + "). No WhatsApp, toque no clipe 📎 → Documento e escolha esse arquivo.";
+        });
+        box.appendChild(b);
+        var v = document.createElement("div");
+        v.style.cssText = "font-size:10px;opacity:.55;margin-top:6px";
+        v.textContent = "Envio " + VERSAO + " · " + file.name + " · " + Math.round(file.size / 1024) + " KB";
+        box.appendChild(v);
+      }
+
       function aguardarToque(file) {      // o navegador só deixa compartilhar logo depois de um toque
         pronto = file; setRotulo("Toque para enviar o PDF");
-        msg("PDF pronto. Toque no botão verde de novo para escolher o WhatsApp.");
+        painel(file, "PDF pronto. Toque no botão verde de novo (ou em “Compartilhar PDF”) para escolher o WhatsApp.");
       }
-      function compartilhar(file) {
+      // resolve true se a lista de compartilhamento realmente abriu; false se falhou (com o motivo em ultimoErro)
+      var ultimoErro = null;
+      function compartilhar(file, segunda) {
+        var t0 = Date.now();
         var dados = { files: [file], title: file.name, text: textoMensagem() };
-        return navigator.share(dados).then(function () {
-          msg("Pronto — escolha o contato no WhatsApp para enviar.");
+        var p;
+        try { p = navigator.share(dados); } catch (e) { ultimoErro = e; return Promise.resolve(false); }
+        return p.then(function () {
+          painel(file, "Pronto — escolha o contato no WhatsApp para enviar.");
           return true;
         }, function (e) {
-          if (e && e.name === "AbortError") { msg(""); return true; }          // fechou a lista, sem erro
-          if (e && (e.name === "NotAllowedError" || e.name === "SecurityError")) {   // passou muito tempo desde o toque
+          ultimoErro = e;
+          if (!segunda && e && (e.name === "NotAllowedError" || e.name === "SecurityError")) {   // passou muito tempo desde o toque
             aguardarToque(file);
             return true;
           }
+          var rapido = Date.now() - t0 < 700;
+          // fechar a lista demora mais que 0,7 s; falha instantânea = o celular recusou, não foi o usuário
+          if (e && e.name === "AbortError" && !rapido) { painel(file, "Envio cancelado. Se quiser tentar de novo, use as opções abaixo."); return true; }
           return false;
         });
       }
@@ -298,35 +348,50 @@
       // baixa as bibliotecas de PDF em segundo plano, para o primeiro envio não esperar a internet
       (window.requestIdleCallback || function (f) { setTimeout(f, 3500); })(function () { ensureLibs().catch(function () {}); });
 
+      function fim() { btn.disabled = false; if (!pronto) setRotulo("Enviar no WhatsApp"); }
+
       btn.addEventListener("click", function () {
-        if (btn.disabled) return;
-        if (pronto) {                                   // 2º toque: já temos o arquivo, compartilha na hora
-          var f = pronto; pronto = null; setRotulo("Enviar no WhatsApp");
-          compartilhar(f).then(function (ok) { if (!ok) mostrarFallback(f); });
-          return;
+        try {
+          if (btn.disabled) return;
+          if (pronto) {                                   // 2º toque: já temos o arquivo, compartilha na hora
+            var f = pronto; pronto = null; setRotulo("Enviar no WhatsApp");
+            compartilhar(f, true).then(function (ok) {
+              if (!ok) painel(f, "O celular não abriu a lista de compartilhamento. Use as opções abaixo.", "Motivo: " + motivo(ultimoErro), true);
+            });
+            return;
+          }
+          btn.disabled = true; setRotulo("Gerando PDF…");
+          msg("Preparando o PDF… isso leva alguns segundos.");
+          try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) {}
+          var cli = cfg.cliente && cfg.cliente();
+          var ref = cfg.ref && cfg.ref();
+          var nome = nomeArquivo(cfg.doc, cli, ref);
+          var limite = new Promise(function (_, rej) { setTimeout(function () { var e = new Error("demorou demais para montar o PDF"); e.diag = { etapa: "tempo" }; rej(e); }, 150000); });
+          Promise.race([gerarPdf({ sheet: cfg.sheet, format: cfg.format, margin: cfg.margin, titulo: nome.replace(/\.pdf$/, "") }, function (t) { setRotulo(t); msg(t); }), limite])
+            .then(function (r) {
+              var file = new File([r.blob], nome, { type: "application/pdf" });
+              if (window.GSJ && GSJ.logAction) GSJ.logAction("whatsapp", cfg.key || null, (ref || cli || null));
+              var pode = podeCompartilhar(file);
+              // celulares mais lentos demoram para montar o PDF e o toque "vence": pede um novo toque em vez de falhar
+              if (pode && navigator.userActivation && !navigator.userActivation.isActive) { aguardarToque(file); return; }
+              if (pode) {
+                return compartilhar(file).then(function (ok) {
+                  if (!ok) painel(file, "O celular não abriu a lista de compartilhamento. Use as opções abaixo.", "Motivo: " + motivo(ultimoErro), true);
+                });
+              }
+              baixar(file);
+              painel(file, "PDF gerado e baixado. Toque em “Abrir WhatsApp” e anexe o arquivo pelo clipe 📎 → Documento.", "Este navegador não permite enviar o arquivo direto.");
+            })
+            .catch(function (e) {
+              var d = e && e.diag ? e.diag : {};
+              msg("Não deu pra gerar o PDF: " + (e && e.message ? e.message : "erro inesperado") +
+                ". Toque no botão para tentar de novo. [etapa: " + (d.etapa || "?") + (d.escala ? ", escala " + d.escala : "") + (d.tamanho ? ", " + d.tamanho : "") + "] " + VERSAO, true);
+            })
+            .then(fim);
+        } catch (e) {
+          msg("Erro ao iniciar o envio: " + motivo(e) + " (" + VERSAO + "). Recarregue a página e tente de novo.", true);
+          fim();
         }
-        btn.disabled = true; setRotulo("Gerando PDF…"); msg("");
-        var cli = cfg.cliente && cfg.cliente();
-        var ref = cfg.ref && cfg.ref();
-        var nome = nomeArquivo(cfg.doc, cli, ref);
-        var limite = new Promise(function (_, rej) { setTimeout(function () { var e = new Error("demorou demais para montar o PDF"); e.diag = { etapa: "tempo" }; rej(e); }, 150000); });
-        Promise.race([gerarPdf({ sheet: cfg.sheet, format: cfg.format, margin: cfg.margin, titulo: nome.replace(/\.pdf$/, "") }, setRotulo), limite])
-          .then(function (r) {
-            var file = new File([r.blob], nome, { type: "application/pdf" });
-            if (window.GSJ && GSJ.logAction) GSJ.logAction("whatsapp", cfg.key || null, (ref || cli || null));
-            var pode = false;
-            try { pode = !!(navigator.canShare && navigator.share && navigator.canShare({ files: [file] })); } catch (e) {}
-            // celulares mais lentos demoram para montar o PDF e o toque "vence": pede um novo toque em vez de falhar
-            if (pode && navigator.userActivation && !navigator.userActivation.isActive) { aguardarToque(file); return; }
-            if (pode) return compartilhar(file).then(function (ok) { if (!ok) { baixar(file); mostrarFallback(file); } });
-            baixar(file); mostrarFallback(file);
-          })
-          .catch(function (e) {
-            var d = e && e.diag ? e.diag : {};
-            msg("Não deu pra gerar o PDF: " + (e && e.message ? e.message : "erro inesperado") +
-              ". Toque no botão para tentar de novo. [etapa: " + (d.etapa || "?") + (d.escala ? ", escala " + d.escala : "") + (d.tamanho ? ", " + d.tamanho : "") + "]", true);
-          })
-          .then(function () { btn.disabled = false; if (!pronto) setRotulo("Enviar no WhatsApp"); });
       });
     }
   };
