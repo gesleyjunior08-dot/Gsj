@@ -68,13 +68,15 @@
     ".sig-signed img{max-height:44px;max-width:100%;display:block}" +
     ".sig-signed .sig-nome{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:15px;line-height:1.1;color:#1b2a6b;padding-bottom:3px;text-align:center}" +
     ".sig-stamp{display:block;margin-top:3px;font-size:8.5px;line-height:1.35;color:#6b5d4f}" +
-    ".sig-carimbo{position:relative;min-height:62px;display:flex;gap:8px;align-items:flex-start;padding:4px 0 0}" +
-    ".sig-carimbo:before{content:'';position:absolute;right:0;top:0;width:58%;height:100%;background:#eff0ee;border-radius:0 0 0 46px;z-index:0}" +
-    ".sig-carimbo .sd-l{position:relative;z-index:1;flex:0 0 42%;font-family:Arial,Helvetica,sans-serif;font-weight:500;font-size:10.5px;line-height:1.28;color:#14110d;overflow-wrap:anywhere;text-transform:uppercase}" +
-    ".sig-carimbo .sd-r{position:relative;z-index:1;flex:1;font-family:Arial,Helvetica,sans-serif;font-size:7px;line-height:1.35;color:#2b2926;padding:2px 4px 2px 0;overflow-wrap:anywhere}" +
+    ".sig-carimbo{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:flex-start;padding:2px 0 0;min-width:0}" +
+    ".sig-carimbo .sd-l{flex:1 1 104px;min-width:0;font-family:Arial,Helvetica,sans-serif;color:#14110d}" +
+    ".sig-carimbo .sd-n{font-weight:700;font-size:11px;line-height:1.25;letter-spacing:.02em;text-transform:uppercase;overflow-wrap:anywhere}" +
+    ".sig-carimbo .sd-c{margin-top:3px;font-size:9px;line-height:1.2;color:#5a5249;letter-spacing:.02em}" +
+    ".sig-carimbo .sd-r{flex:1.5 1 136px;min-width:0;box-sizing:border-box;background-color:#eef0ec;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='17' fill='none' stroke='%23d7dad3' stroke-width='2.2'/%3E%3Cpath d='M12 20.5l5.5 5.5L28.5 14.5' fill='none' stroke='%23d7dad3' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 6px bottom 5px;background-size:34px 34px;border-radius:3px 3px 3px 26px;padding:7px 9px 8px;font-family:Arial,Helvetica,sans-serif;font-size:7.4px;line-height:1.4;color:#2b2926;overflow-wrap:anywhere}" +
+    ".sig-carimbo .sd-r b{font-weight:700;color:#14110d}" +
     ".sig-nome-serif{font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.15;color:#14110d;margin:6px 0 0}" +
     ".sig-col .sig-label2{margin:2px 0 0;font-size:10px;color:#6b5d4f;line-height:1.35}" +
-    ".sig-signed-sp{height:62px}" +
+    ".sig-signed-sp{height:54px}" +
     ".btn-assinar{display:flex;width:100%;justify-content:center;align-items:center;gap:8px;margin:0 0 8px;background:transparent;border:1.5px solid var(--accent,#954f14);color:var(--accent,#954f14);border-radius:10px;font:inherit;font-weight:700;font-size:14px;padding:11px 16px;cursor:pointer}" +
     ".btn-assinar:hover{background:rgba(149,79,20,.08)}" +
     ".btn-assinar[hidden]{display:none!important}" +
@@ -194,9 +196,11 @@
   function carimbo(a) {
     var cnpj = String(a.empresa.cnpj || "").replace(/\D/g, "");
     var id = esc(a.empresa.razao) + (cnpj ? ":" + cnpj : "");
+    var cnpjFmt = a.empresa.cnpj || cnpj;
     return '<div class="sig-carimbo">' +
-      '<div class="sd-l">' + esc(a.empresa.razao) + (cnpj ? '<wbr/><span style="white-space:nowrap">:' + cnpj + '</span>' : '') + '</div>' +
-      '<div class="sd-r">Assinado eletronicamente por ' + id +
+      '<div class="sd-l"><div class="sd-n">' + esc(a.empresa.razao) + '</div>' +
+        (cnpjFmt ? '<div class="sd-c">CNPJ ' + esc(cnpjFmt) + '</div>' : '') + '</div>' +
+      '<div class="sd-r"><b>Assinado eletronicamente</b> por ' + id +
         '<br/>Dados: ' + esc(dadosStamp(a.em)) +
         '<br/>Código do documento: ' + esc(a.codigo) + '</div>' +
       '</div>';
