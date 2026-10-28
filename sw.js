@@ -7,7 +7,7 @@
 // Pra publicar uma atualização: troque o número da versão abaixo
 // (CACHE_VERSION) sempre que mudar algum arquivo. Sem isso, quem já
 // instalou o app pode continuar vendo a versão antiga por um tempo.
-const CACHE_VERSION = "v18";
+const CACHE_VERSION = "v19";
 const CACHE_NAME = "gsj-app-" + CACHE_VERSION;
 
 const PRECACHE_URLS = [
@@ -81,19 +81,30 @@ self.addEventListener("fetch", function (event) {
     return;
   }
 
+  // Rede primeiro: com internet, sempre pega a versão mais nova do app (acabou o "abre 2 ou 3 vezes
+  // pra atualizar"). Sem internet, ou se a rede demorar mais de 4 s, usa a cópia guardada.
   event.respondWith(
-    caches.match(req).then(function (cached) {
-      const network = fetch(req).then(function (response) {
+    new Promise(function (resolve) {
+      let resolvido = false;
+      const doCache = function () {
+        return caches.match(req).then(function (c) { return c || caches.match(req, { ignoreSearch: true }); });
+      };
+      const timer = setTimeout(function () {
+        doCache().then(function (c) { if (c && !resolvido) { resolvido = true; resolve(c); } });
+      }, 4000);
+      fetch(req, { cache: "no-cache" }).then(function (response) {
         if (response && response.ok) {
           const copy = response.clone();
           caches.open(CACHE_NAME).then(function (cache) { cache.put(req, copy); });
         }
-        return response;
-      }).catch(function () { return cached; });
-
-      // stale-while-revalidate: mostra o que já tem em cache na hora
-      // (rápido, funciona offline) e atualiza o cache em segundo plano
-      return cached || network;
+        clearTimeout(timer);
+        if (!resolvido) { resolvido = true; resolve(response); }
+      }).catch(function () {
+        clearTimeout(timer);
+        doCache().then(function (c) {
+          if (!resolvido) { resolvido = true; resolve(c || Response.error()); }
+        });
+      });
     })
   );
 });
