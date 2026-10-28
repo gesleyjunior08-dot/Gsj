@@ -239,7 +239,7 @@
       box.className = "wpp-box"; box.id = "wppBox"; box.hidden = true; box.setAttribute("role", "status");
       btn.insertAdjacentElement("afterend", box);
 
-      var VERSAO = "v15";
+      var VERSAO = "v16";
       var pronto = null;           // PDF já gerado (quando o celular exige um novo toque pra compartilhar)
       var ultimo = null;           // último PDF gerado (painel de envio)
       function setRotulo(t) { btn.querySelector("span").textContent = t; }
@@ -299,8 +299,20 @@
           });
           box.appendChild(s);
         }
+        if (erro || !podeCompartilhar(file)) {      // caminho garantido: baixa o PDF e já abre o WhatsApp
+          var g = document.createElement("button");
+          g.type = "button"; g.className = "btn btn-primary"; g.textContent = "Baixar PDF e abrir WhatsApp";
+          g.addEventListener("click", function () {
+            baixar(file);
+            var q = box.querySelector(".wpp-baixou");
+            if (!q) { q = document.createElement("div"); q.className = "wpp-baixou"; q.style.cssText = "font-size:12px;margin-top:6px"; box.appendChild(q); }
+            q.textContent = "PDF baixado (" + file.name + "). No WhatsApp, toque no clipe 📎 → Documento → escolha esse arquivo (fica em Downloads).";
+            setTimeout(function () { try { window.open(linkWa(), "_blank", "noopener"); } catch (e) { location.href = linkWa(); } }, 500);
+          });
+          box.appendChild(g);
+        }
         var a = document.createElement("a");
-        a.className = "btn" + (podeCompartilhar(file) ? "" : " btn-primary"); a.href = linkWa(); a.target = "_blank"; a.rel = "noopener";
+        a.className = "btn"; a.href = linkWa(); a.target = "_blank"; a.rel = "noopener";
         a.textContent = "Abrir WhatsApp ↗";
         box.appendChild(a);
         var b = document.createElement("button");

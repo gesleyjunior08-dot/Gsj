@@ -67,11 +67,14 @@
     ".sig-signed{height:46px;display:flex;align-items:flex-end;justify-content:center}" +
     ".sig-signed img{max-height:44px;max-width:100%;display:block}" +
     ".sig-signed .sig-nome{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:15px;line-height:1.1;color:#1b2a6b;padding-bottom:3px;text-align:center}" +
-    ".sig-signed-sp{height:46px}" +
     ".sig-stamp{display:block;margin-top:3px;font-size:8.5px;line-height:1.35;color:#6b5d4f}" +
-    ".sig-digital{display:flex;gap:7px;align-items:flex-start;margin-top:5px;padding-top:5px;border-top:1px solid #e3d9c8}" +
-    ".sig-digital .sd-l{flex:0 0 40%;font-family:Arial,Helvetica,sans-serif;font-weight:600;font-size:9.5px;line-height:1.25;color:#2b2118;overflow-wrap:anywhere;text-transform:uppercase}" +
-    ".sig-digital .sd-r{flex:1;font-family:Georgia,'Times New Roman',serif;font-size:7.6px;line-height:1.3;color:#3d3328}" +
+    ".sig-carimbo{position:relative;min-height:62px;display:flex;gap:8px;align-items:flex-start;padding:4px 0 0}" +
+    ".sig-carimbo:before{content:'';position:absolute;right:0;top:0;width:58%;height:100%;background:#eff0ee;border-radius:0 0 0 46px;z-index:0}" +
+    ".sig-carimbo .sd-l{position:relative;z-index:1;flex:0 0 42%;font-family:Arial,Helvetica,sans-serif;font-weight:500;font-size:10.5px;line-height:1.28;color:#14110d;overflow-wrap:anywhere;text-transform:uppercase}" +
+    ".sig-carimbo .sd-r{position:relative;z-index:1;flex:1;font-family:Arial,Helvetica,sans-serif;font-size:7px;line-height:1.35;color:#2b2926;padding:2px 4px 2px 0;overflow-wrap:anywhere}" +
+    ".sig-nome-serif{font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.15;color:#14110d;margin:6px 0 0}" +
+    ".sig-col .sig-label2{margin:2px 0 0;font-size:10px;color:#6b5d4f;line-height:1.35}" +
+    ".sig-signed-sp{height:62px}" +
     ".btn-assinar{display:flex;width:100%;justify-content:center;align-items:center;gap:8px;margin:0 0 8px;background:transparent;border:1.5px solid var(--accent,#954f14);color:var(--accent,#954f14);border-radius:10px;font:inherit;font-weight:700;font-size:14px;padding:11px 16px;cursor:pointer}" +
     ".btn-assinar:hover{background:rgba(149,79,20,.08)}" +
     ".btn-assinar[hidden]{display:none!important}" +
@@ -191,11 +194,11 @@
   function carimbo(a) {
     var cnpj = String(a.empresa.cnpj || "").replace(/\D/g, "");
     var id = esc(a.empresa.razao) + (cnpj ? ":" + cnpj : "");
-    return '<div class="sig-digital">' +
-      '<div class="sd-l">' + esc(a.empresa.razao) + (a.empresa.cnpj ? '<br/>CNPJ: ' + esc(a.empresa.cnpj) : '') + '</div>' +
+    return '<div class="sig-carimbo">' +
+      '<div class="sd-l">' + esc(a.empresa.razao) + (cnpj ? '<wbr/><span style="white-space:nowrap">:' + cnpj + '</span>' : '') + '</div>' +
       '<div class="sd-r">Assinado eletronicamente por ' + id +
         '<br/>Dados: ' + esc(dadosStamp(a.em)) +
-        '<br/>Responsável: ' + esc(a.nome) + ' · Código do documento: ' + esc(a.codigo) + '</div>' +
+        '<br/>Código do documento: ' + esc(a.codigo) + '</div>' +
       '</div>';
   }
 
@@ -216,13 +219,18 @@
     col: function (state, original) {
       var a = state && state.assinatura;
       if (!a) return original;
-      var rot = (a.rotulo || []).map(esc).join("<br/>");
+      var raw = (a.rotulo || []).filter(Boolean), rot = raw.map(esc);
+      if (a.empresa && !a.img) {          // só o carimbo, sem campo de assinatura
+        return '<div class="sig-col">' + carimbo(a) +
+          '<div class="sig-nome-serif">' + (rot[0] || esc(NOME_CARIMBO)) + '</div>' +
+          (rot[1] ? '<p class="sig-label2">' + rot.slice(1).join(" · ") + '</p>' : '') +
+          '</div>';
+      }
+      // assinaturas antigas (com o desenho) continuam aparecendo como antes
       return '<div class="sig-col">' +
-        '<div class="sig-signed">' + (a.img ? '<img src="' + a.img + '" alt="Assinatura"/>' : '<span class="sig-nome">' + esc(NOME_CARIMBO) + '</span>') + '</div>' +
+        '<div class="sig-signed">' + (a.img ? '<img src="' + a.img + '" alt="Assinatura"/>' : '') + '</div>' +
         '<div class="sig-line"></div>' +
-        '<p class="sig-label">' + rot +
-          (a.empresa ? '' : '<span class="sig-stamp">Assinado eletronicamente por ' + esc(a.nome) + ' em ' + esc(dataHora(a.em)) +
-          '<br/>Código do documento: ' + esc(a.codigo) + '</span>') + '</p>' +
+        '<p class="sig-label">' + rot.join("<br/>") + '</p>' +
         (a.empresa ? carimbo(a) : '') +
         '</div>';
     },
@@ -235,9 +243,6 @@
       var btn = document.createElement("button");
       btn.type = "button"; btn.id = "btnAssinar"; btn.className = "btn-assinar";
       btnPrint.insertAdjacentElement("beforebegin", btn);
-      var btnMao = document.createElement("button");
-      btnMao.type = "button"; btnMao.id = "btnAssinarMao"; btnMao.className = "btn-assinar sec";
-      btnPrint.insertAdjacentElement("beforebegin", btnMao);
       var box = document.createElement("div");
       box.id = "assBox"; box.className = "ass-box"; box.hidden = true; box.setAttribute("role", "status");
       btnPrint.insertAdjacentElement("beforebegin", box);
@@ -246,17 +251,11 @@
         var st = cfg.getState(), a = st && st.assinatura;
         box.textContent = ""; box.className = "ass-box";
         if (a) {
-          btn.className = "btn-assinar feito"; btn.textContent = "Remover assinatura"; btnMao.hidden = true;
+          btn.className = "btn-assinar feito"; btn.textContent = "Remover assinatura";
           box.hidden = false; box.className = "ass-box ok";
           box.textContent = "✔ Assinado por " + a.nome + " em " + dataHora(a.em) + " · código " + a.codigo + ". O PDF e o WhatsApp saem assinados.";
-          if (a.img) {
-            var l = document.createElement("a"); l.textContent = "Trocar minha assinatura";
-            l.addEventListener("click", function () { abrirPad(function (img) { gravarAssinatura(img); assinar("mao", false); }); });
-            box.appendChild(l);
-          }
         } else {
-          btn.className = "btn-assinar"; btn.textContent = "✍️ Assinar (carimbo)";
-          btnMao.hidden = false; btnMao.textContent = "🖋️ Assinar com a minha assinatura";
+          btn.className = "btn-assinar"; btn.textContent = "✍️ Assinar";
           if (aviso) { box.hidden = false; box.className = "ass-box aviso"; box.textContent = aviso; }
           else box.hidden = true;
         }
@@ -294,7 +293,6 @@
         }
         assinar("carimbo", true);
       });
-      btnMao.addEventListener("click", function () { assinar("mao", true); });
       refresh();
     }
   };

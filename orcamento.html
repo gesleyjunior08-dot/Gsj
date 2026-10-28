@@ -1487,7 +1487,7 @@
     getState: function () { return state; },
     render: function () { updatePreview(); },
     save: function () { safeSave(); },
-    rotulo: function () { return [(state.companyName || "GSJ") + " — " + (state.companyTag || "")]; },
+    rotulo: function () { return [state.companyName || "GSJ", state.companyTag || ""]; },
     ref: function () { return state.orcamentoId; }
   });
 
