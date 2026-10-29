@@ -72,7 +72,7 @@
     ".sig-carimbo .sd-l{flex:1 1 104px;min-width:0;font-family:Arial,Helvetica,sans-serif;color:#14110d}" +
     ".sig-carimbo .sd-n{font-weight:700;font-size:11px;line-height:1.25;letter-spacing:.02em;text-transform:uppercase;overflow-wrap:anywhere}" +
     ".sig-carimbo .sd-c{margin-top:3px;font-size:9px;line-height:1.2;color:#5a5249;letter-spacing:.02em}" +
-    ".sig-carimbo .sd-r{flex:1.5 1 136px;min-width:0;box-sizing:border-box;background-color:#eef0ec;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='17' fill='none' stroke='%23d7dad3' stroke-width='2.2'/%3E%3Cpath d='M12 20.5l5.5 5.5L28.5 14.5' fill='none' stroke='%23d7dad3' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 6px bottom 5px;background-size:34px 34px;border-radius:3px 3px 3px 26px;padding:7px 9px 8px;font-family:Arial,Helvetica,sans-serif;font-size:7.4px;line-height:1.4;color:#2b2926;overflow-wrap:anywhere}" +
+    ".sig-carimbo .sd-r{flex:1.5 1 136px;min-width:0;box-sizing:border-box;background-color:#eef0ec;border-radius:3px 3px 3px 26px;padding:7px 9px 8px;font-family:Arial,Helvetica,sans-serif;font-size:7.4px;line-height:1.4;color:#2b2926;overflow-wrap:anywhere}" +
     ".sig-carimbo .sd-r b{font-weight:700;color:#14110d}" +
     ".sig-nome-serif{font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.15;color:#14110d;margin:6px 0 0}" +
     ".sig-col .sig-label2{margin:2px 0 0;font-size:10px;color:#6b5d4f;line-height:1.35}" +

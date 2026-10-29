@@ -159,8 +159,14 @@
         });
         blocks = blocks.filter(function (b) { return b.bottom - b.top > 4; });
 
-        function renderizar(escala) {
+        function renderizar(escala, simples) {
           diag.escala = escala; diag.tentativas++;
+          if (simples) {                              // última tentativa: tira imagens de fundo/efeitos que alguns navegadores não conseguem desenhar
+            diag.simples = true;
+            Array.prototype.forEach.call(clone.querySelectorAll("*"), function (el) {
+              try { el.style.backgroundImage = "none"; el.style.boxShadow = "none"; el.style.filter = "none"; } catch (e) {}
+            });
+          }
           return window.html2canvas(clone, {
             scale: escala, backgroundColor: "#ffffff", useCORS: true, logging: false,
             width: innerWpx, windowWidth: innerWpx
@@ -170,11 +176,20 @@
         diag.etapa = "imagem";
         return etapa(onEtapa, "Gerando imagem…")
           .then(function () { return renderizar(escala); })
-          .catch(function () {                       // memória/limite do aparelho: tenta de novo menor
+          .catch(function (e1) {                     // memória/limite do aparelho: tenta de novo menor
+            diag.erro1 = e1 && e1.message;
             return etapa(onEtapa, "Tentando de novo…").then(function () { return renderizar(Math.max(1.1, escala * 0.65)); });
           })
+          .catch(function (e2) {                     // ainda falhou: versão simplificada (sem imagens de fundo)
+            diag.erro2 = e2 && e2.message;
+            return etapa(onEtapa, "Tentando versão simples…").then(function () { return renderizar(Math.max(1.1, escala * 0.65), true); });
+          })
           .then(function (canvas) { holder.remove(); return { canvas: canvas, blocks: blocks, escala: diag.escala }; },
-                function (e) { holder.remove(); throw e; });
+                function (e) {
+                  holder.remove();
+                  try { diag.pilha = String((e && e.stack) || "").split("\n").slice(1, 3).join(" | ").replace(/https?:\/\/[^ )]*\//g, "").slice(0, 160); } catch (x) {}
+                  throw e;
+                });
       })
       .then(function (r) {
         diag.etapa = "pdf";
@@ -239,7 +254,7 @@
       box.className = "wpp-box"; box.id = "wppBox"; box.hidden = true; box.setAttribute("role", "status");
       btn.insertAdjacentElement("afterend", box);
 
-      var VERSAO = "v16";
+      var VERSAO = "v20";
       var pronto = null;           // PDF já gerado (quando o celular exige um novo toque pra compartilhar)
       var ultimo = null;           // último PDF gerado (painel de envio)
       function setRotulo(t) { btn.querySelector("span").textContent = t; }
@@ -397,7 +412,7 @@
             .catch(function (e) {
               var d = e && e.diag ? e.diag : {};
               msg("Não deu pra gerar o PDF: " + (e && e.message ? e.message : "erro inesperado") +
-                ". Toque no botão para tentar de novo. [etapa: " + (d.etapa || "?") + (d.escala ? ", escala " + d.escala : "") + (d.tamanho ? ", " + d.tamanho : "") + "] " + VERSAO, true);
+                ". Toque no botão para tentar de novo. [etapa: " + (d.etapa || "?") + (d.escala ? ", escala " + d.escala : "") + (d.tamanho ? ", " + d.tamanho : "") + (d.simples ? ", simples" : "") + (d.pilha ? ", " + d.pilha : "") + "] " + VERSAO, true);
             })
             .then(fim);
         } catch (e) {
